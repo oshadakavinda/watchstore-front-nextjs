@@ -61,7 +61,7 @@ export default function Featured({product}){
                    </div>
                    </Column>
                     <Column>
-                        <img src="https://placehold.co/400" alt="" />
+                        <img src="https://next-watchstore.s3.amazonaws.com/1721821811036.png" alt="" />
                     </Column>
              </ColumnsWrapper>
             </Center>
