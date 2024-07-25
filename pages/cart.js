@@ -1,5 +1,5 @@
 import { Header } from "@/components/Header";
-
+import styled from "styled-components";
 const ColumnsWrapper = styled.div`
   display: grid;
   grid-template-columns: 1fr;
