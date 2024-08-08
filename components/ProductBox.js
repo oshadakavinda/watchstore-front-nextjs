@@ -53,7 +53,7 @@ const Price = styled.div`
   text-align: right;
   @media screen and (min-width: 768px) {
     font-size: 1.2rem;
-    font-weight:600;
+    font-weight:400;
     text-align: left;
   }
 `;
@@ -72,7 +72,7 @@ export default function ProductBox({_id,title,description,price,images}) {
         <Title href={url}>{title}</Title>
         <PriceRow>
           <Price>
-            ${price}
+            Rs.{price}
           </Price>
           <Button block onClick={() => addProduct(_id)} primary outline>
             Add to cart
