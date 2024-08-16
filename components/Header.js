@@ -5,12 +5,17 @@ import {useContext, useState} from "react";
 import { CartContext } from "./CartContext";
 import BarsIcon from "./icons/bars";
 const StyledHeader = styled.header`
-background-color:#222;
+ background-color: #222;
+  position:sticky;
+  top:0;
+  z-index:10;
 
 `;
 const Logo = styled(Link)`
 color:#fff;
 text-decoration:none; 
+position :relative;
+z-index:3;
 `
 const Wrapper =styled.div`
 display: flex;
@@ -37,9 +42,17 @@ ${props => props.mobileNavActive ? `
     padding: 0;
 `;
 const NavLink = styled(Link)`
-display:block;
-color:#aaa;
-text-decoration:none;
+ display: block;
+  color:#aaa;
+  text-decoration:none;
+  min-width:30px;
+  padding: 10px 0;
+  svg{
+    height:20px;
+  }
+  @media screen and (min-width: 768px) {
+    padding:0;
+  }
 `;
 const NavButton = styled.button`
     background-color: transparent;
@@ -57,20 +70,21 @@ const NavButton = styled.button`
 
 export default function Header(){
     const {cartProducts} = useContext(CartContext);
+    const[mobileNavActive,setMobileNavActive] =useState(false);
     return(
         
         <StyledHeader>
             <Center>
                 <Wrapper>
                 <Logo href={'/'}>Watchstore</Logo>
-            <StyledNav>
+            <StyledNav mobileNavActive={mobileNavActive}>
                 <NavLink href={'/'}>Home</NavLink>
                 <NavLink href={'/products'}>All products</NavLink>
                 <NavLink href={'/categories'}>Categories</NavLink>
                 <NavLink href={'/account'}>Account</NavLink>
                 <NavLink href={'/cart'}>Cart ({cartProducts.length})</NavLink>
             </StyledNav>
-            <NavButton>
+            <NavButton onClick={()=>setMobileNavActive(prev=>!prev)}>
                 <BarsIcon/> 
             </NavButton>
                 </Wrapper>
