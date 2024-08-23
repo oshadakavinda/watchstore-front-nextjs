@@ -4,9 +4,13 @@ import CartIcon from "@/components/icons/CartIcon";
 import Link from "next/link";
 import {useContext} from "react";
 import {CartContext} from "@/components/CartContext";
-
+import FlyingButton from "@/components/FlyingButton";
 const ProductWrapper = styled.div`
-  
+  button{
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
 `;
 
 const WhiteBox = styled(Link)`
@@ -58,6 +62,26 @@ const Price = styled.div`
   }
 `;
 
+const WishlistButton = styled.button`
+  border:0;
+  width: 40px !important;
+  height: 40px;
+  padding: 10px;
+  position: absolute;
+  top:0;
+  right:0;
+  background:transparent;
+  cursor: pointer;
+  ${props => props.wished ? `
+    color:red;
+  ` : `
+    color:black;
+  `}
+  svg{
+    width: 16px;
+  }
+`;
+
 export default function ProductBox({_id,title,description,price,images}) {
   const {addProduct} = useContext(CartContext);
   const url = '/product/'+_id;
@@ -74,9 +98,7 @@ export default function ProductBox({_id,title,description,price,images}) {
           <Price>
             Rs.{price}
           </Price>
-          <Button block onClick={() => addProduct(_id)} primary outline>
-            Add to cart
-          </Button>
+          <FlyingButton _id={_id} src={images?.[0]}>Add to cart</FlyingButton>
         </PriceRow>
       </ProductInfoBox>
     </ProductWrapper>

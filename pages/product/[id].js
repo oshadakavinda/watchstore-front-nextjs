@@ -8,7 +8,7 @@ import styled from "styled-components";
 import ProductImages from "@/components/ProductImages";
 import { CartContext } from "@/components/CartContext";
 import { useContext } from "react";
-import Button from "@/components/Button";
+import FlyingButton from "@/components/FlyingButton";
 import CartIcon from "@/components/icons/CartIcon";
 
 const ColWrapper = styled.div`
@@ -58,9 +58,9 @@ export default function ProductPage({ product }) {
                 <Price>Rs. {product.price}</Price>
               </div>
               <div>
-                <Button primary onClick={() => addProduct?.(product._id)}>
-                  <CartIcon /> Add to cart
-                </Button>
+              <FlyingButton main _id={product._id} src={product.images?.[0]}>
+                  <CartIcon />Add to cart
+                </FlyingButton>
               </div>
             </PriceRow>
           </div>
