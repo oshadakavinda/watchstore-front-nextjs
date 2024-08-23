@@ -7,6 +7,7 @@ import {CartContext} from "@/components/CartContext";
 import axios from "axios";
 import Table from "@/components/Table";
 import Input from "@/components/Input";
+import {RevealWrapper} from '@/components/RevealWrapper';
 
 const ColumnsWrapper = styled.div`
   display: grid;
@@ -136,6 +137,7 @@ export default function CartPage() {
       <Header />
       <Center>
         <ColumnsWrapper>
+        <RevealWrapper delay={0}>
           <Box>
             <h2>Cart</h2>
             {!cartProducts?.length && (
@@ -160,13 +162,13 @@ export default function CartPage() {
                         {product.title}
                       </ProductInfoCell>
                       <td>
-                        <Button
-                          onClick={() => lessOfThisProduct(product._id)}>-</Button>
+                      <Button
+                          onClick={() => moreOfThisProduct(product._id)}>+</Button>
                         <QuantityLabel>
                           {cartProducts.filter(id => id === product._id).length}
                         </QuantityLabel>
                         <Button
-                          onClick={() => moreOfThisProduct(product._id)}>+</Button>
+                          onClick={() => lessOfThisProduct(product._id)}>-</Button>
                       </td>
                       <td>
                         Rs.{cartProducts.filter(id => id === product._id).length * product.price}
@@ -182,6 +184,7 @@ export default function CartPage() {
               </Table>
             )}
           </Box>
+          </RevealWrapper>
           {!!cartProducts?.length && (
             <Box>
               <h2>Order information</h2>

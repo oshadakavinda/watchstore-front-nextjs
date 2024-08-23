@@ -9,6 +9,7 @@ import { mongooseConnect } from "@/lib/mongoose";
 import { getServerSession } from "next-auth";
 // import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { WishedProduct } from "@/models/WishedProduct";
+import {RevealWrapper} from '@/components/RevealWrapper'
 
 const CategoryGrid = styled.div`
   display: grid;
@@ -64,12 +65,16 @@ export default function CategoriesPage({ mainCategories, categoriesProducts, wis
               </div>
             </CategoryTitle>
             <CategoryGrid>
-              {categoriesProducts[cat._id].map(p => (
-                <ProductBox key={p._id} {...p} wished={wishedProducts.includes(p._id)} />
+              {categoriesProducts[cat._id].map((p,index) => (
+                <RevealWrapper delay={index*50} key={index}>
+                <ProductBox {...p} wished={wishedProducts.includes(p._id)} />
+              </RevealWrapper>
               ))}
-              <ShowAllSquare href={'/category/' + cat._id}>
-                Show all &rarr;
-              </ShowAllSquare>
+              <RevealWrapper delay={categoriesProducts[cat._id].length*50}>
+                <ShowAllSquare href={'/category/'+cat._id}>
+                  Show all &rarr;
+                </ShowAllSquare>
+              </RevealWrapper>
             </CategoryGrid>
           </CategoryWrapper>
         ))}
