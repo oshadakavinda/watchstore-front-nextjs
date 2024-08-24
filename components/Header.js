@@ -78,8 +78,8 @@ const SideIcons = styled.div`
     min-width:20px;
     color:white;
     svg{
-      width:14px;
-      height:14px;
+      width:18px;
+      height:18px;
     }
   }
 `;
