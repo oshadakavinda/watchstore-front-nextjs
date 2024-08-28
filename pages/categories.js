@@ -7,7 +7,7 @@ import styled from "styled-components";
 import Link from "next/link";
 import { mongooseConnect } from "@/lib/mongoose";
 import { getServerSession } from "next-auth";
-// import { authOptions } from "@/pages/api/auth/[...nextauth]";
+ import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { WishedProduct } from "@/models/WishedProduct";
 import {RevealWrapper} from '@/components/RevealWrapper'
 
@@ -101,17 +101,9 @@ export async function getServerSideProps(ctx) {
     categoriesProducts[mainCat._id] = products;
   }
 
-  // Dummy session since auth is not working
-  const dummySession = {
-    user: {
-      name: "John Doe",
-      email: "johndoe@example.com",
-    },
-  };
+  
+   const session = await getServerSession(ctx.req, ctx.res, authOptions);
 
-  // Replace this with your actual session retrieval if it starts working
-  // const session = await getServerSession(ctx.req, ctx.res, authOptions);
-  const session = dummySession;
 
   const wishedProducts = session?.user
     ? await WishedProduct.find({

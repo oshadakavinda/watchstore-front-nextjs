@@ -49,6 +49,7 @@ export default function AccountPage() {
   const [activeTab, setActiveTab] = useState('Orders');
   const [orders, setOrders] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
+  const [isEditable, setIsEditable] = useState(false);  // New state for edit mode
 
   async function logout() {
     await signOut({
@@ -64,7 +65,12 @@ export default function AccountPage() {
     const data = { name, email, city, streetAddress, postalCode, country };
     axios.put('/api/address', data).then(() => {
       setIsEditing(true);
+      setIsEditable(false);  // Lock fields after saving
     });
+  }
+
+  function handleEditClick() {
+    setIsEditable(true);  // Enable fields for editing
   }
 
   useEffect(() => {
@@ -82,9 +88,9 @@ export default function AccountPage() {
         setPostalCode(response.data.postalCode || '');
         setStreetAddress(response.data.streetAddress || '');
         setCountry(response.data.country || '');
-        setIsEditing(true); // Set to true if data exists
+        setIsEditing(true);  // Set to true if data exists
       } else {
-        setIsEditing(false); // Set to false if no data exists
+        setIsEditing(false);  // Set to false if no data exists
       }
       setAddressLoaded(true);
     }).catch(() => {
@@ -172,6 +178,7 @@ export default function AccountPage() {
                       value={name}
                       name="name"
                       onChange={(ev) => setName(ev.target.value)}
+                      disabled={!isEditable}  // Disable when not editing
                     />
                     <Input
                       type="text"
@@ -179,6 +186,7 @@ export default function AccountPage() {
                       value={email}
                       name="email"
                       onChange={(ev) => setEmail(ev.target.value)}
+                      disabled={!isEditable}  // Disable when not editing
                     />
                     <CityHolder>
                       <Input
@@ -187,6 +195,7 @@ export default function AccountPage() {
                         value={city}
                         name="city"
                         onChange={(ev) => setCity(ev.target.value)}
+                        disabled={!isEditable}  // Disable when not editing
                       />
                       <Input
                         type="text"
@@ -194,6 +203,7 @@ export default function AccountPage() {
                         value={postalCode}
                         name="postalCode"
                         onChange={(ev) => setPostalCode(ev.target.value)}
+                        disabled={!isEditable}  // Disable when not editing
                       />
                     </CityHolder>
                     <Input
@@ -202,6 +212,7 @@ export default function AccountPage() {
                       value={streetAddress}
                       name="streetAddress"
                       onChange={(ev) => setStreetAddress(ev.target.value)}
+                      disabled={!isEditable}  // Disable when not editing
                     />
                     <Input
                       type="text"
@@ -209,9 +220,14 @@ export default function AccountPage() {
                       value={country}
                       name="country"
                       onChange={(ev) => setCountry(ev.target.value)}
+                      disabled={!isEditable}  // Disable when not editing
                     />
-                    <Button black block onClick={saveAddress}>
-                      {isEditing ? 'Edit' : 'Save'}
+                    <Button
+                      black
+                      block
+                      onClick={isEditable ? saveAddress : handleEditClick} // Toggle between save and edit
+                    >
+                      {isEditable ? 'Save' : 'Edit'}
                     </Button>
                     <hr />
                   </>
