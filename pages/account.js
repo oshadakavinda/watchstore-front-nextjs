@@ -15,14 +15,21 @@ import SingleOrder from "@/components/SingleOrder";
 
 const ColsWrapper = styled.div`
   display:grid;
-  grid-template-columns: 1.2fr .8fr;
+  grid-template-columns: 1.6fr .8fr;
   gap: 40px;
   margin: 40px 0;
   p{
     margin:5px;
   }
 `;
-
+const OrdersWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 1000px;  // Adjust as needed
+  margin: 0 auto;  // Center the container
+`;
 const CityHolder = styled.div`
   display:flex;
   gap: 5px;
@@ -98,10 +105,12 @@ export default function AccountPage() {
     });
 
     axios.get('/api/wishlist').then((response) => {
+      
       setWishedProducts(response.data.map((wp) => wp.product));
       setWishlistLoaded(true);
     });
     axios.get('/api/orders').then((response) => {
+      console.log('Orders fetched:', response.data);
       setOrders(response.data);
       setOrderLoaded(true);
     });
@@ -132,7 +141,7 @@ export default function AccountPage() {
                     {orderLoaded && (
                       <div>
                         {orders.length === 0 && <p>Login to see your orders</p>}
-                        {orders.length > 0 && orders.map((o) => <SingleOrder {...o} />)}
+                        {orders.length > 0 && orders.map((o) => <SingleOrder key={o._id} {...o} />)}
                       </div>
                     )}
                   </>

@@ -12,6 +12,7 @@ const StyledOrder = styled.div`
     font-size: 1rem;
     color: #555;
   }
+    
 `;
 
 const ProductRow = styled.div`
