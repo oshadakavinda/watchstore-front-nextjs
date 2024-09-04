@@ -29,9 +29,9 @@ export default async function handler(req,res) {
       line_items.push({
         quantity,
         price_data: {
-          currency: 'USD',
-          product_data: {name:productInfo.title},
-          unit_amount: quantity * productInfo.price * 100,
+              currency: 'LKR',
+              product_data: { name: productInfo.title },
+              unit_amount: productInfo.price * 100, // Corrected: price per single unit
         },
       });
     }
@@ -45,8 +45,8 @@ export default async function handler(req,res) {
     userEmail: session?.user?.email,
   });
 
-  // const shippingFeeSetting = await Setting.findOne({name:'shippingFee'});
-  // const shippingFeeCents = parseInt(shippingFeeSetting.value || '0') * 100;
+   const shippingFeeSetting = await Setting.findOne({name:'shippingFee'});
+   const shippingFeeCents = parseInt(shippingFeeSetting.value || '0') * 100;
 
   const stripeSession = await stripe.checkout.sessions.create({
     line_items,
@@ -61,7 +61,7 @@ export default async function handler(req,res) {
         shipping_rate_data: {
           display_name: 'shipping fee',
           type: 'fixed_amount',
-          fixed_amount: {amount: shippingFeeCents, currency: 'USD'},
+          fixed_amount: {amount: shippingFeeCents, currency: 'LKR'},
         },
       }
     ],
