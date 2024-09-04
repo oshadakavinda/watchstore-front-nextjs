@@ -18,6 +18,21 @@ const ColumnsWrapper = styled.div`
   }
   gap: 40px;
   margin-top: 40px;
+  margin-bottom: 40px;
+  table thead tr th:nth-child(3),
+  table tbody tr td:nth-child(3),
+  table tbody tr.subtotal td:nth-child(2){
+    text-align: right;
+  }
+  table tr.subtotal td{
+    padding: 15px 0;
+  }
+  table tbody tr.subtotal td:nth-child(2){
+    font-size: 1.4rem;
+  }
+  tr.total td{
+    font-weight: bold;
+  }
 `;
 
 const Box = styled.div`
@@ -28,6 +43,7 @@ const Box = styled.div`
 
 const ProductInfoCell = styled.td`
   padding: 10px 0;
+  button{padding:0 !important;}
 `;
 
 const ProductImageBox = styled.div`
@@ -79,6 +95,7 @@ export default function CartPage() {
   const [streetAddress,setStreetAddress] = useState('');
   const [country,setCountry] = useState('');
   const [isSuccess,setIsSuccess] = useState(false);
+  const [shippingFee, setShippingFee] = useState(null);
   useEffect(() => {
     if (cartProducts.length > 0) {
       axios.post('/api/cart', {ids:cartProducts})
@@ -89,7 +106,7 @@ export default function CartPage() {
       setProducts([]);
     }
   }, [cartProducts]);
-
+  
   useEffect(() => {
     if (typeof window === 'undefined') {
       return;
@@ -98,22 +115,25 @@ export default function CartPage() {
       setIsSuccess(true);
       clearCart();
     }
+    axios.get('/api/settings?name=shippingFee').then(res => {
+      setShippingFee(res.data.value);
+    })
   }, []);
-
   useEffect(() => {
     if (!session) {
       return;
     }
     axios.get('/api/address').then(response => {
-      setName(response.data.name);
-      setEmail(response.data.email);
-      setCity(response.data.city);
-      setPostalCode(response.data.postalCode);
-      setStreetAddress(response.data.streetAddress);
-      setCountry(response.data.country);
+      const data = response.data || {}; // Default to an empty object if response.data is null
+      setName(data.name || '');
+      setEmail(data.email || '');
+      setCity(data.city || '');
+      setPostalCode(data.postalCode || '');
+      setStreetAddress(data.streetAddress || '');
+      setCountry(data.country || '');
     });
   }, [session]);
-
+  
   function moreOfThisProduct(id) {
     addProduct(id);
   }
@@ -129,10 +149,10 @@ export default function CartPage() {
       window.location = response.data.url;
     }
   }
-  let total = 0;
+  let productsTotal = 0;
   for (const productId of cartProducts) {
     const price = products.find(p => p._id === productId)?.price || 0;
-    total += price;
+    productsTotal += price;
   }
 
   if (isSuccess) {
@@ -155,22 +175,22 @@ export default function CartPage() {
       <Header />
       <Center>
         <ColumnsWrapper>
-        <RevealWrapper delay={0}>
-          <Box>
-            <h2>Cart</h2>
-            {!cartProducts?.length && (
-              <div>Your cart is empty</div>
-            )}
-            {products?.length > 0 && (
-              <Table>
-                <thead>
+          <RevealWrapper delay={0}>
+            <Box>
+              <h2>Cart</h2>
+              {!cartProducts?.length && (
+                <div>Your cart is empty</div>
+              )}
+              {products?.length > 0 && (
+                <Table>
+                  <thead>
                   <tr>
                     <th>Product</th>
                     <th>Quantity</th>
                     <th>Price</th>
                   </tr>
-                </thead>
-                <tbody>
+                  </thead>
+                  <tbody>
                   {products.map(product => (
                     <tr key={product._id}>
                       <ProductInfoCell>
@@ -180,7 +200,7 @@ export default function CartPage() {
                         {product.title}
                       </ProductInfoCell>
                       <td>
-                      <Button
+                        <Button
                           onClick={() => moreOfThisProduct(product._id)}>+</Button>
                         <QuantityLabel>
                           {cartProducts.filter(id => id === product._id).length}
@@ -193,56 +213,65 @@ export default function CartPage() {
                       </td>
                     </tr>
                   ))}
-                  <tr>
-                    <td></td>
-                    <td></td>
-                    <td>Rs.{total}</td>
+                  <tr className="subtotal">
+                    <td colSpan={2}>Products</td>
+                    <td>Rs.{productsTotal}</td>
                   </tr>
-                </tbody>
-              </Table>
-            )}
-          </Box>
+                  <tr className="subtotal">
+                    <td colSpan={2}>Shipping</td>
+                    <td>Rs.{shippingFee}</td>
+                  </tr>
+                  <tr className="subtotal total">
+                    <td colSpan={2}>Total</td>
+                    <td>Rs.{productsTotal + parseInt(shippingFee || 0)}</td>
+                  </tr>
+                  </tbody>
+                </Table>
+              )}
+            </Box>
           </RevealWrapper>
           {!!cartProducts?.length && (
-            <Box>
-              <h2>Order information</h2>
-              <Input type="text"
-                     placeholder="Name"
-                     value={name}
-                     name="name"
-                     onChange={ev => setName(ev.target.value)} />
-              <Input type="text"
-                     placeholder="Email"
-                     value={email}
-                     name="email"
-                     onChange={ev => setEmail(ev.target.value)}/>
-              <CityHolder>
+            <RevealWrapper delay={100}>
+              <Box>
+                <h2>Order information</h2>
                 <Input type="text"
-                       placeholder="City"
-                       value={city}
-                       name="city"
-                       onChange={ev => setCity(ev.target.value)}/>
+                       placeholder="Name"
+                       value={name}
+                       name="name"
+                       onChange={ev => setName(ev.target.value)} />
                 <Input type="text"
-                       placeholder="Postal Code"
-                       value={postalCode}
-                       name="postalCode"
-                       onChange={ev => setPostalCode(ev.target.value)}/>
-              </CityHolder>
-              <Input type="text"
-                     placeholder="Street Address"
-                     value={streetAddress}
-                     name="streetAddress"
-                     onChange={ev => setStreetAddress(ev.target.value)}/>
-              <Input type="text"
-                     placeholder="Country"
-                     value={country}
-                     name="country"
-                     onChange={ev => setCountry(ev.target.value)}/>
-              <Button black block
-                      onClick={goToPayment}>
-                Continue to payment
-              </Button>
-            </Box>
+                       placeholder="Email"
+                       value={email}
+                       name="email"
+                       onChange={ev => setEmail(ev.target.value)}/>
+                <CityHolder>
+                  <Input type="text"
+                         placeholder="City"
+                         value={city}
+                         name="city"
+                         onChange={ev => setCity(ev.target.value)}/>
+                  <Input type="text"
+                         placeholder="Postal Code"
+                         value={postalCode}
+                         name="postalCode"
+                         onChange={ev => setPostalCode(ev.target.value)}/>
+                </CityHolder>
+                <Input type="text"
+                       placeholder="Street Address"
+                       value={streetAddress}
+                       name="streetAddress"
+                       onChange={ev => setStreetAddress(ev.target.value)}/>
+                <Input type="text"
+                       placeholder="Country"
+                       value={country}
+                       name="country"
+                       onChange={ev => setCountry(ev.target.value)}/>
+                <Button black block
+                        onClick={goToPayment}>
+                  Continue to payment
+                </Button>
+              </Box>
+            </RevealWrapper>
           )}
         </ColumnsWrapper>
       </Center>
