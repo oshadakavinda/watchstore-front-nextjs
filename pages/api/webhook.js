@@ -3,17 +3,27 @@ const stripe = require('stripe')(process.env.STRIPE_SK);
 import {buffer} from 'micro';
 import {Order} from "@/models/Order";
 
-const endpointSecret = "whsec_e9435f2684d460d61f3f751de64f042758266bda2ef4d904f2ba95c8bea8772c";
-
 export default async function handler(req,res) {
+  if (req.method !== 'POST') {
+    res.setHeader('Allow', 'POST');
+    return res.status(405).json({error: 'Method not allowed'});
+  }
+
   await mongooseConnect();
   const sig = req.headers['stripe-signature'];
+  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  if (!endpointSecret) {
+    console.error('Missing STRIPE_WEBHOOK_SECRET environment variable');
+    return res.status(500).json({error: 'Server configuration error'});
+  }
 
   let event;
 
   try {
     event = stripe.webhooks.constructEvent(await buffer(req), sig, endpointSecret);
   } catch (err) {
+    console.error('Webhook signature verification failed:', err.message);
     res.status(400).send(`Webhook Error: ${err.message}`);
     return;
   }
@@ -31,7 +41,7 @@ export default async function handler(req,res) {
       }
       break;
     default:
-      console.log(`Unhandled event type ${event.type}`);
+      break;
   }
 
   res.status(200).send('ok');
@@ -40,6 +50,3 @@ export default async function handler(req,res) {
 export const config = {
   api: {bodyParser:false,}
 };
-
-// bright-thrift-cajole-lean
-// acct_1PlnPdC53g1V3AxY

@@ -8,6 +8,8 @@ export function CartContextProvider({children}) {
   useEffect(() => {
     if (cartProducts?.length > 0) {
       ls?.setItem('cart', JSON.stringify(cartProducts));
+    } else {
+      ls?.removeItem('cart');
     }
   }, [cartProducts]);
   useEffect(() => {

@@ -110,7 +110,6 @@ export default function AccountPage() {
       setWishlistLoaded(true);
     });
     axios.get('/api/orders').then((response) => {
-      console.log('Orders fetched:', response.data);
       setOrders(response.data);
       setOrderLoaded(true);
     });
