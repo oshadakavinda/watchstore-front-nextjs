@@ -1,20 +1,26 @@
 import {BounceLoader} from "react-spinners";
 import styled from "styled-components";
+import {primary} from "@/lib/tokens";
 
 const Wrapper = styled.div`
   ${props => props.fullWidth ? `
-    display:block;
-    display:flex;
-    justify-content:center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 0;
+    width: 100%;
   ` : `
-    border: 5xp solid blue;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
   `}
 `;
 
 export default function Spinner({fullWidth}) {
   return (
-    <Wrapper fullWidth={fullWidth}>
-      <BounceLoader speedMultiplier={3} color={'#555'} />
+    <Wrapper fullWidth={fullWidth} role="status" aria-label="Loading">
+      <BounceLoader speedMultiplier={2} color={primary} />
     </Wrapper>
   );
 }
