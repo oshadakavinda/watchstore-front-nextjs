@@ -1,31 +1,38 @@
 import styled from "styled-components";
 
 const StyledOrder = styled.div`
-  margin: 10px 0;
-  padding: 10px 0;
-  border-bottom: 1px solid #ddd;
+  margin: 14px 0;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--color-border-light, rgba(0, 0, 0, 0.1));
   display: flex;
-  gap: 20px;
-  align-items: center;
+  gap: 24px;
+  align-items: flex-start;
+  flex-wrap: wrap;
 
   time {
-    font-size: 1rem;
-    color: #555;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-text, #1a1a1a);
   }
-    
 `;
 
 const ProductRow = styled.div`
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: var(--color-text, #1a1a1a);
+  margin-bottom: 4px;
+
   span {
-    color: #aaa;
+    color: var(--color-primary, #0D3D29);
+    font-weight: 600;
   }
 `;
 
 const Address = styled.div`
-  font-size: 0.8rem;
-  line-height: 1rem;
-  margin-top: 5px;
-  color: #888;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  margin-top: 6px;
+  color: var(--color-text-muted, #767676);
 `;
 
 export default function SingleOrder({ line_items = [], createdAt, ...rest }) {
