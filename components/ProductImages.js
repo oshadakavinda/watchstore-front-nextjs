@@ -1,53 +1,100 @@
 import styled from "styled-components";
 import {useState} from "react";
 
-const Image = styled.img`
-    max-width: 100%;
-    max-height: 100%;
-  `;
-const BigImage = styled.img`
-  max-width: 100%;
-  max-height: 200px;
-`;
-const ImageButtons = styled.div`
-    display: flex;
-    gap: 10px;
-    flex-grow: 0;
-    margin-top: 10px;
-  `;
-const ImageButton = styled.div`
-    border: 2px solid #ccc;
-    ${props => props.active ? `
-      border-color: #ccc;
-    ` : `
-      border-color: transparent;
-    `}
-    height: 40px;
-    padding: 2px;
-    cursor: pointer;
-    border-radius: 5px;
-  `;
 const BigImageWrapper = styled.div`
   text-align: center;
+  background-color: #fafafa;
+  border-radius: var(--radius-md, 10px);
+  border: 1px solid var(--color-border-light, rgba(0, 0, 0, 0.08));
+  overflow: hidden;
+  height: 380px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: zoom-in;
+
+  @media screen and (min-width: 768px) {
+    height: 460px;
+  }
 `;
 
-export default function ProductImages({images}) {
-  const [activeImage,setActiveImage] = useState(images?.[0]);
+const BigImage = styled.img`
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+  transition: transform 300ms ease-out;
+
+  ${BigImageWrapper}:hover & {
+    transform: scale(1.35);
+  }
+`;
+
+const ImageButtons = styled.div`
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+`;
+
+const ImageButton = styled.button`
+  background: #fafafa;
+  border: 2px solid ${props => (props.active ? 'var(--color-primary, #0D3D29)' : 'var(--color-border, #cccccc)')};
+  height: 56px;
+  width: 56px;
+  padding: 4px;
+  cursor: pointer;
+  border-radius: var(--radius-sm, 5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 200ms ease, transform 150ms ease, box-shadow 200ms ease;
+
+  &:hover {
+    border-color: var(--color-primary, #0D3D29);
+    transform: translateY(-2px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary, #0D3D29);
+    outline-offset: 2px;
+  }
+`;
+
+const ThumbnailImage = styled.img`
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+`;
+
+export default function ProductImages({images = [], title = "Product"}) {
+  const [activeImage, setActiveImage] = useState(images?.[0]);
+
+  // Fallback if images change
+  const currentImage = images.includes(activeImage) ? activeImage : images[0];
+
   return (
-    <>
+    <div>
       <BigImageWrapper>
-        <BigImage src={activeImage} />
+        <BigImage src={currentImage} alt={`${title} - large view`} />
       </BigImageWrapper>
-      <ImageButtons>
-        {images.map(image => (
-          <ImageButton
-            key={image}
-            active={image===activeImage}
-            onClick={() => setActiveImage(image)}>
-            <Image src={image} alt=""/>
-          </ImageButton>
-        ))}
-      </ImageButtons>
-    </>
+      {images.length > 1 && (
+        <ImageButtons role="tablist" aria-label="Product thumbnails">
+          {images.map((image, index) => (
+            <ImageButton
+              type="button"
+              key={image}
+              active={image === currentImage}
+              onClick={() => setActiveImage(image)}
+              aria-label={`View ${title} image ${index + 1}`}
+              role="tab"
+              aria-selected={image === currentImage}
+            >
+              <ThumbnailImage src={image} alt={`${title} thumbnail ${index + 1}`} />
+            </ImageButton>
+          ))}
+        </ImageButtons>
+      )}
+    </div>
   );
 }
