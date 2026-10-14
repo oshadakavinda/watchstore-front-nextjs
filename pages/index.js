@@ -7,13 +7,29 @@ import {WishedProduct} from "@/models/WishedProduct";
 import {getServerSession} from "next-auth";
 import {authOptions} from "@/pages/api/auth/[...nextauth]";
 import {Setting} from "@/models/Setting";
+import Center from "@/components/Center";
+import TrustStrip from "@/components/TrustStrip";
+import NewsletterSignup from "@/components/NewsletterSignup";
+import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 
-export default function HomePage({featuredProduct,newProducts,wishedNewProducts}) {
+export default function HomePage({featuredProduct, newProducts, wishedNewProducts}) {
   return (
     <div>
+      <SEO
+        title="WatchStore — Luxury Timepieces & Horology Standard"
+        description="Explore precision craftsmanship and certified luxury watches with complimentary worldwide delivery and official 2-year warranty."
+      />
       <Header />
       <Featured product={featuredProduct} />
+      <Center>
+        <TrustStrip />
+      </Center>
       <NewProducts products={newProducts} wishedProducts={wishedNewProducts} />
+      <Center>
+        <NewsletterSignup />
+      </Center>
+      <Footer />
     </div>
   );
 }

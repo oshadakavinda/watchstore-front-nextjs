@@ -13,32 +13,55 @@ import ProductBox from "@/components/ProductBox";
 import Tabs from "@/components/Tabs";
 import SingleOrder from "@/components/SingleOrder";
 
+import Breadcrumb from "@/components/Breadcrumb";
+import Toast from "@/components/Toast";
+import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
+import Link from "next/link";
+
 const ColsWrapper = styled.div`
-  display:grid;
-  grid-template-columns: 1.6fr .8fr;
-  gap: 40px;
-  margin: 40px 0;
-  p{
-    margin:5px;
+  display: grid;
+  grid-template-columns: 1fr;
+  @media screen and (min-width: 820px) {
+    grid-template-columns: 1.35fr 0.85fr;
   }
+  gap: 36px;
+  margin: 20px 0 60px;
 `;
-const OrdersWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  width: 100%;
-  max-width: 1000px;  // Adjust as needed
-  margin: 0 auto;  // Center the container
-`;
+
 const CityHolder = styled.div`
-  display:flex;
-  gap: 5px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+`;
+
+const FormGroup = styled.div`
+  margin-bottom: 12px;
+
+  label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 4px;
+    color: var(--color-text, #1a1a1a);
+  }
 `;
 
 const WishedProductsGrid = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 40px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-top: 16px;
+`;
+
+const EmptyStateText = styled.div`
+  text-align: center;
+  padding: 40px 16px;
+  color: var(--color-text-muted, #767676);
+
+  p {
+    margin: 8px 0 20px;
+  }
 `;
 
 export default function AccountPage() {
@@ -56,11 +79,12 @@ export default function AccountPage() {
   const [activeTab, setActiveTab] = useState('Orders');
   const [orders, setOrders] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
-  const [isEditable, setIsEditable] = useState(false);  // New state for edit mode
+  const [isEditable, setIsEditable] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
 
   async function logout() {
     await signOut({
-      callbackUrl: process.env.NEXT_PUBLIC_URL,
+      callbackUrl: process.env.NEXT_PUBLIC_URL || '/',
     });
   }
 
@@ -72,12 +96,13 @@ export default function AccountPage() {
     const data = { name, email, city, streetAddress, postalCode, country };
     axios.put('/api/address', data).then(() => {
       setIsEditing(true);
-      setIsEditable(false);  // Lock fields after saving
+      setIsEditable(false);
+      setToastMessage('Shipping address updated successfully!');
     });
   }
 
   function handleEditClick() {
-    setIsEditable(true);  // Enable fields for editing
+    setIsEditable(true);
   }
 
   useEffect(() => {
@@ -95,9 +120,9 @@ export default function AccountPage() {
         setPostalCode(response.data.postalCode || '');
         setStreetAddress(response.data.streetAddress || '');
         setCountry(response.data.country || '');
-        setIsEditing(true);  // Set to true if data exists
+        setIsEditing(true);
       } else {
-        setIsEditing(false);  // Set to false if no data exists
+        setIsEditing(false);
       }
       setAddressLoaded(true);
     }).catch(() => {
@@ -105,7 +130,6 @@ export default function AccountPage() {
     });
 
     axios.get('/api/wishlist').then((response) => {
-      
       setWishedProducts(response.data.map((wp) => wp.product));
       setWishlistLoaded(true);
     });
@@ -123,8 +147,14 @@ export default function AccountPage() {
 
   return (
     <>
+      <SEO
+        title="My Account — WatchStore"
+        description="Manage your WatchStore orders, saved delivery addresses, and personal wishlist."
+      />
+      <Toast message={toastMessage} onClose={() => setToastMessage('')} />
       <Header />
       <Center>
+        <Breadcrumb items={[{ label: 'Account' }]} />
         <ColsWrapper>
           <div>
             <RevealWrapper delay={0}>
@@ -139,7 +169,16 @@ export default function AccountPage() {
                     {!orderLoaded && <Spinner fullWidth={true} />}
                     {orderLoaded && (
                       <div>
-                        {orders.length === 0 && <p>Login to see your orders</p>}
+                        {orders.length === 0 && (
+                          <EmptyStateText>
+                            <p>{session ? 'You have not placed any timepiece orders yet.' : 'Please sign in to view your order history.'}</p>
+                            {!session && (
+                              <Button primary onClick={login}>
+                                Sign In With Google
+                              </Button>
+                            )}
+                          </EmptyStateText>
+                        )}
                         {orders.length > 0 && orders.map((o) => <SingleOrder key={o._id} {...o} />)}
                       </div>
                     )}
@@ -161,10 +200,12 @@ export default function AccountPage() {
                           ))}
                         </WishedProductsGrid>
                         {wishedProducts.length === 0 && (
-                          <>
-                            {session && <p>Your wishlist is empty</p>}
-                            {!session && <p>Login to add products to your wishlist</p>}
-                          </>
+                          <EmptyStateText>
+                            <p>{session ? 'Your saved wishlist is empty.' : 'Please sign in to access your curated wishlist.'}</p>
+                            <Button primary href="/products">
+                              Explore Watches
+                            </Button>
+                          </EmptyStateText>
                         )}
                       </>
                     )}
@@ -173,80 +214,122 @@ export default function AccountPage() {
               </WhiteBox>
             </RevealWrapper>
           </div>
+
           <div>
             <RevealWrapper delay={100}>
               <WhiteBox>
-                <h2>{session ? 'Account details' : 'Login'}</h2>
+                <h2 style={{fontFamily: 'var(--font-heading)', margin: '0 0 16px 0'}}>
+                  {session ? 'Account & Delivery' : 'Client Access'}
+                </h2>
                 {!addressLoaded && <Spinner fullWidth={true} />}
                 {addressLoaded && session && (
                   <>
-                    <Input
-                      type="text"
-                      placeholder="Name"
-                      value={name}
-                      name="name"
-                      onChange={(ev) => setName(ev.target.value)}
-                      disabled={!isEditable}  // Disable when not editing
-                    />
-                    <Input
-                      type="text"
-                      placeholder="Email"
-                      value={email}
-                      name="email"
-                      onChange={(ev) => setEmail(ev.target.value)}
-                      disabled={!isEditable}  // Disable when not editing
-                    />
+                    <FormGroup>
+                      <label htmlFor="accName">Full Name</label>
+                      <Input
+                        id="accName"
+                        type="text"
+                        placeholder="Full name"
+                        value={name}
+                        name="name"
+                        onChange={(ev) => setName(ev.target.value)}
+                        disabled={!isEditable}
+                      />
+                    </FormGroup>
+                    <FormGroup>
+                      <label htmlFor="accEmail">Email Address</label>
+                      <Input
+                        id="accEmail"
+                        type="email"
+                        placeholder="Email"
+                        value={email}
+                        name="email"
+                        onChange={(ev) => setEmail(ev.target.value)}
+                        disabled={!isEditable}
+                      />
+                    </FormGroup>
                     <CityHolder>
-                      <Input
-                        type="text"
-                        placeholder="City"
-                        value={city}
-                        name="city"
-                        onChange={(ev) => setCity(ev.target.value)}
-                        disabled={!isEditable}  // Disable when not editing
-                      />
-                      <Input
-                        type="text"
-                        placeholder="Postal Code"
-                        value={postalCode}
-                        name="postalCode"
-                        onChange={(ev) => setPostalCode(ev.target.value)}
-                        disabled={!isEditable}  // Disable when not editing
-                      />
+                      <FormGroup>
+                        <label htmlFor="accCity">City</label>
+                        <Input
+                          id="accCity"
+                          type="text"
+                          placeholder="City"
+                          value={city}
+                          name="city"
+                          onChange={(ev) => setCity(ev.target.value)}
+                          disabled={!isEditable}
+                        />
+                      </FormGroup>
+                      <FormGroup>
+                        <label htmlFor="accPostal">Postal Code</label>
+                        <Input
+                          id="accPostal"
+                          type="text"
+                          placeholder="Postal Code"
+                          value={postalCode}
+                          name="postalCode"
+                          onChange={(ev) => setPostalCode(ev.target.value)}
+                          disabled={!isEditable}
+                        />
+                      </FormGroup>
                     </CityHolder>
-                    <Input
-                      type="text"
-                      placeholder="Street Address"
-                      value={streetAddress}
-                      name="streetAddress"
-                      onChange={(ev) => setStreetAddress(ev.target.value)}
-                      disabled={!isEditable}  // Disable when not editing
-                    />
-                    <Input
-                      type="text"
-                      placeholder="Country"
-                      value={country}
-                      name="country"
-                      onChange={(ev) => setCountry(ev.target.value)}
-                      disabled={!isEditable}  // Disable when not editing
-                    />
+                    <FormGroup>
+                      <label htmlFor="accAddress">Street Address</label>
+                      <Input
+                        id="accAddress"
+                        type="text"
+                        placeholder="Street Address"
+                        value={streetAddress}
+                        name="streetAddress"
+                        onChange={(ev) => setStreetAddress(ev.target.value)}
+                        disabled={!isEditable}
+                      />
+                    </FormGroup>
+                    <FormGroup>
+                      <label htmlFor="accCountry">Country</label>
+                      <Input
+                        id="accCountry"
+                        type="text"
+                        placeholder="Country"
+                        value={country}
+                        name="country"
+                        onChange={(ev) => setCountry(ev.target.value)}
+                        disabled={!isEditable}
+                      />
+                    </FormGroup>
                     <Button
-                      black
+                      primary={isEditable ? 1 : 0}
+                      black={!isEditable ? 1 : 0}
                       block
-                      onClick={isEditable ? saveAddress : handleEditClick} // Toggle between save and edit
+                      onClick={isEditable ? saveAddress : handleEditClick}
                     >
-                      {isEditable ? 'Save' : 'Edit'}
+                      {isEditable ? 'Save Address Changes' : 'Edit Delivery Address'}
                     </Button>
                     <hr />
                   </>
                 )}
-                {session && <Button primary onClick={logout}>Logout</Button>}
-                {!session && <Button primary onClick={login}>Login with Google</Button>}
+                {session && (
+                  <Button primary outline block onClick={logout}>
+                    Sign Out
+                  </Button>
+                )}
+                {!session && (
+                  <div>
+                    <p style={{color: '#666', fontSize: '0.9rem', marginBottom: '16px'}}>
+                      Sign in securely with Google to access saved orders, delivery addresses, and your personal horology wishlist.
+                    </p>
+                    <Button primary block onClick={login}>
+                      Sign In With Google
+                    </Button>
+                  </div>
+                )}
               </WhiteBox>
             </RevealWrapper>
           </div>
         </ColsWrapper>
       </Center>
+      <Footer />
     </>
   );
 }

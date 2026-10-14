@@ -9,14 +9,26 @@ import {getServerSession} from "next-auth";
 import {authOptions} from "@/pages/api/auth/[...nextauth]";
 import {WishedProduct} from "@/models/WishedProduct";
 
-export default function ProductsPage({products,wishedProducts}) {
+import Breadcrumb from "@/components/Breadcrumb";
+import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
+
+export default function ProductsPage({products, wishedProducts}) {
   return (
     <>
+      <SEO
+        title="All Luxury Timepieces — WatchStore"
+        description="Explore the complete WatchStore catalog of Swiss automatic watches, chronographs, and limited edition horological timepieces."
+      />
       <Header />
       <Center>
-        <Title>All products</Title>
-        <ProductsGrid products={products} wishedProducts={wishedProducts} />
+        <Breadcrumb items={[{ label: 'All Watches' }]} />
+        <Title>All Timepieces</Title>
+        <div style={{marginBottom: '60px'}}>
+          <ProductsGrid products={products} wishedProducts={wishedProducts} />
+        </div>
       </Center>
+      <Footer />
     </>
   );
 }
