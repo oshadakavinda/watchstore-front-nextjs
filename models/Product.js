@@ -5,8 +5,10 @@ const ProductSchema = new Schema({
   description: String,
   price: {type: Number, required: true},
   images: [{type:String}],
+  mainCategory: {type:mongoose.Types.ObjectId, ref:'MainCategory'},
   category: {type:mongoose.Types.ObjectId, ref:'Category'},
   properties: {type:Object},
+  stock: {type: Number, default: 10},
 }, {
   timestamps: true,
 });
