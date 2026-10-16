@@ -159,12 +159,23 @@ const PaymentBadge = styled.span`
 export default function Footer() {
   const [subscribed, setSubscribed] = useState(false);
   const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (email) {
+    if (!email) return;
+    setLoading(true);
+    try {
+      await (await import('axios')).default.post('/api/newsletter', {
+        email,
+        source: 'footer',
+      });
       setSubscribed(true);
       setEmail('');
+    } catch (err) {
+      alert('Failed to subscribe. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -183,24 +194,24 @@ export default function Footer() {
           </Column>
 
           <Column>
-            <ColumnTitle>Shop</ColumnTitle>
+            <ColumnTitle>Collections</ColumnTitle>
             <LinkList>
               <li><FooterLink href="/products">All Timepieces</FooterLink></li>
-              <li><FooterLink href="/categories">Collections</FooterLink></li>
-              <li><FooterLink href="/products">Automatic Watches</FooterLink></li>
-              <li><FooterLink href="/products">Chronographs</FooterLink></li>
-              <li><FooterLink href="/products">Limited Editions</FooterLink></li>
+              <li><FooterLink href="/categories">Curated Collections</FooterLink></li>
+              <li><FooterLink href="/compare">Compare Watches</FooterLink></li>
+              <li><FooterLink href="/account">Collector Account</FooterLink></li>
+              <li><FooterLink href="/cart">Shopping Bag</FooterLink></li>
             </LinkList>
           </Column>
 
           <Column>
-            <ColumnTitle>Customer Care</ColumnTitle>
+            <ColumnTitle>Concierge & Legal</ColumnTitle>
             <LinkList>
-              <li><FooterLink href="/account">My Account</FooterLink></li>
-              <li><FooterLink href="/cart">Shopping Bag</FooterLink></li>
+              <li><FooterLink href="/faq">Frequently Asked Questions</FooterLink></li>
+              <li><FooterLink href="/returns">Delivery & Returns Policy</FooterLink></li>
+              <li><FooterLink href="/terms">Terms of Service</FooterLink></li>
+              <li><FooterLink href="/privacy">Privacy & Security</FooterLink></li>
               <li><FooterLink href="/account">Order Tracking</FooterLink></li>
-              <li><FooterLink href="/account">Warranty & Service</FooterLink></li>
-              <li><FooterLink href="/account">Shipping & Returns</FooterLink></li>
             </LinkList>
           </Column>
 

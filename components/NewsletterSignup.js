@@ -77,12 +77,25 @@ const SuccessAlert = styled.div`
 export default function NewsletterSignup() {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (email) {
+    if (!email) return;
+    setLoading(true);
+    try {
+      const res = await (await import('axios')).default.post('/api/newsletter', {
+        email,
+        source: 'homepage_section',
+      });
       setSubmitted(true);
+      setMessage(res.data?.message || 'Welcome to the WatchStore Collectors Circle.');
       setEmail('');
+    } catch (err) {
+      alert(err.response?.data?.error || 'Failed to subscribe. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
