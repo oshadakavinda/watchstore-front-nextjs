@@ -18,6 +18,7 @@ const Bg = styled.div`
 
 const Title = styled.h1`
   margin: 0;
+  color: #ffffff;
   font-family: var(--font-heading);
   font-weight: 600;
   font-size: 2rem;
