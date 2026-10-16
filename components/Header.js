@@ -3,10 +3,13 @@ import styled from "styled-components";
 import Center from "@/components/Center";
 import {useContext, useState, useEffect} from "react";
 import {useRouter} from "next/router";
+import {useSession} from "next-auth/react";
 import {CartContext} from "@/components/CartContext";
 import BarsIcon from "@/components/icons/Bars";
 import SearchIcon from "@/components/icons/SearchIcon";
 import CartIcon from "./icons/CartIcon";
+import HeartOutlineIcon from "./icons/HeartOutlineIcon";
+import axios from "axios";
 
 const StyledHeader = styled.header`
   background-color: var(--color-header-bg, #222222);
@@ -137,18 +140,19 @@ const NavButton = styled.button`
 const SideIcons = styled.div`
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 
   a {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     color: var(--color-nav-link, #b5b5b5);
-    min-width: 40px;
-    min-height: 40px;
-    padding: 4px 8px;
+    min-width: 38px;
+    min-height: 38px;
+    padding: 4px 6px;
     border-radius: var(--radius-sm, 5px);
     transition: color 200ms ease-out, background-color 200ms ease-out;
+    position: relative;
 
     &:hover {
       color: #ffffff;
@@ -165,17 +169,31 @@ const SideIcons = styled.div`
 const CartBadge = styled.span`
   background-color: var(--color-accent, #C8472B);
   color: #fff;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 600;
   border-radius: 9999px;
-  padding: 1px 7px;
-  margin-left: 5px;
+  padding: 1px 6px;
+  margin-left: 4px;
+  display: inline-block;
+  line-height: 1.4;
+`;
+
+const WishlistBadge = styled.span`
+  background-color: #D4AF37;
+  color: #000;
+  font-size: 0.72rem;
+  font-weight: 700;
+  border-radius: 9999px;
+  padding: 1px 6px;
+  margin-left: 4px;
   display: inline-block;
   line-height: 1.4;
 `;
 
 export default function Header() {
-  const {cartProducts} = useContext(CartContext);
+  const { cartProducts } = useContext(CartContext);
+  const { data: session } = useSession();
+  const [wishlistCount, setWishlistCount] = useState(0);
   const [mobileNavActive, setMobileNavActive] = useState(false);
   const router = useRouter();
 
@@ -183,6 +201,16 @@ export default function Header() {
     // Close mobile nav on route change
     setMobileNavActive(false);
   }, [router.asPath]);
+
+  useEffect(() => {
+    if (session) {
+      axios.get('/api/wishlist').then(res => {
+        if (Array.isArray(res.data)) {
+          setWishlistCount(res.data.length);
+        }
+      }).catch(() => {});
+    }
+  }, [session, router.asPath]);
 
   const isActive = (path) => {
     if (path === '/') return router.pathname === '/';
@@ -204,6 +232,9 @@ export default function Header() {
             <NavLink href={'/categories'} $active={isActive('/categories')} onClick={() => setMobileNavActive(false)}>
               Categories
             </NavLink>
+            <NavLink href={'/compare'} $active={isActive('/compare')} onClick={() => setMobileNavActive(false)}>
+              Compare
+            </NavLink>
             <NavLink href={'/account'} $active={isActive('/account')} onClick={() => setMobileNavActive(false)}>
               Account
             </NavLink>
@@ -211,6 +242,10 @@ export default function Header() {
           <SideIcons>
             <Link href={'/search'} aria-label="Search products">
               <SearchIcon />
+            </Link>
+            <Link href={'/account'} aria-label="View Wishlist">
+              <HeartOutlineIcon />
+              {wishlistCount > 0 && <WishlistBadge>{wishlistCount}</WishlistBadge>}
             </Link>
             <Link href={'/cart'} aria-label={`Shopping cart with ${cartProducts.length} items`}>
               <CartIcon />

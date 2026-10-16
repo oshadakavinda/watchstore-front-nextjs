@@ -1,8 +1,10 @@
-import {createGlobalStyle} from "styled-components";
-import {CartContextProvider} from "@/components/CartContext";
-import {SessionProvider} from "next-auth/react";
+import { createGlobalStyle } from "styled-components";
+import { CartContextProvider } from "@/components/CartContext";
+import { SessionProvider } from "next-auth/react";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import CartDrawer from "@/components/CartDrawer";
+import ErrorBoundary from "@/components/ErrorBoundary";
+import Script from "next/script";
 
 const GlobalStyles = createGlobalStyle`
   :root {
@@ -114,15 +116,67 @@ const GlobalStyles = createGlobalStyle`
   }
 `;
 
-export default function App({ Component, pageProps: {session, ...pageProps } }) {
+export default function App({ Component, pageProps: { session, ...pageProps } }) {
+  const gaId = process.env.NEXT_PUBLIC_GA_ID || 'G-WATCHSTORE123';
+  const pixelId = process.env.NEXT_PUBLIC_PIXEL_ID;
+
   return (
     <>
       <GlobalStyles />
+
+      {/* Google Analytics 4 */}
+      {gaId && (
+        <>
+          <Script
+            strategy="afterInteractive"
+            src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+          />
+          <Script
+            id="google-analytics"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${gaId}', {
+                  page_path: window.location.pathname,
+                });
+              `,
+            }}
+          />
+        </>
+      )}
+
+      {/* Meta Pixel */}
+      {pixelId && (
+        <Script
+          id="meta-pixel"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              !function(f,b,e,v,n,t,s)
+              {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+              n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+              if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+              n.queue=[];t=b.createElement(e);t.async=!0;
+              t.src=v;s=b.getElementsByTagName(e)[0];
+              s.parentNode.insertBefore(t,s)}(window, document,'script',
+              'https://connect.facebook.net/en_US/fbevents.js');
+              fbq('init', '${pixelId}');
+              fbq('track', 'PageView');
+            `,
+          }}
+        />
+      )}
+
       <SessionProvider session={session}>
         <CartContextProvider>
-          <AnnouncementBar />
-          <Component {...pageProps} />
-          <CartDrawer />
+          <ErrorBoundary>
+            <AnnouncementBar />
+            <Component {...pageProps} />
+            <CartDrawer />
+          </ErrorBoundary>
         </CartContextProvider>
       </SessionProvider>
     </>

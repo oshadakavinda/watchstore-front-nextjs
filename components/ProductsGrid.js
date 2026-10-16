@@ -16,6 +16,11 @@ const StyledProductsGrid = styled.div`
     grid-template-columns: repeat(4, 1fr);
     gap: 24px;
   }
+
+  > div {
+    display: flex;
+    height: 100%;
+  }
 `;
 
 export default function ProductsGrid({products,wishedProducts=[]}) {
