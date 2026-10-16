@@ -16,7 +16,12 @@ export default async function handle(req, res) {
     return res.status(401).json({error: 'Not authenticated'});
   }
 
-  res.json(
-    await Order.find({userEmail: session.user.email})
-  );
+  const orders = await Order.find({
+    $or: [
+      { userEmail: session.user.email },
+      { email: session.user.email },
+    ]
+  }).sort({ createdAt: -1 });
+
+  res.json(orders);
 }

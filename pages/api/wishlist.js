@@ -3,8 +3,11 @@ import {getServerSession} from "next-auth";
 import {authOptions} from "@/pages/api/auth/[...nextauth]";
 import {WishedProduct} from "@/models/WishedProduct";
 import mongoose from "mongoose";
+import { applyRateLimit } from "@/lib/security";
 
 export default async function handle(req, res) {
+  if (!applyRateLimit(req, res, { limit: 120 })) return;
+
   if (req.method !== 'POST' && req.method !== 'GET') {
     res.setHeader('Allow', 'GET, POST');
     return res.status(405).json({error: 'Method not allowed'});
