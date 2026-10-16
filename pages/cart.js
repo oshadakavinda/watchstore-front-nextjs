@@ -167,6 +167,9 @@ export default function CartPage() {
   const [shippingFee, setShippingFee] = useState(null);
   const [discountCode, setDiscountCode] = useState('');
   const [discountApplied, setDiscountApplied] = useState(false);
+  const [discountInfo, setDiscountInfo] = useState(null);
+  const [discountError, setDiscountError] = useState('');
+  const [isCheckingDiscount, setIsCheckingDiscount] = useState(false);
 
   useEffect(() => {
     if (cartProducts.length > 0) {
@@ -217,12 +220,17 @@ export default function CartPage() {
   };
 
   async function goToPayment() {
-    const response = await axios.post('/api/checkout', {
-      name, email, city, postalCode, streetAddress, country,
-      cartProducts,
-    });
-    if (response.data.url) {
-      window.location = response.data.url;
+    try {
+      const response = await axios.post('/api/checkout', {
+        name, email, city, postalCode, streetAddress, country,
+        cartProducts,
+        couponCode: discountApplied ? discountCode.trim().toUpperCase() : '',
+      });
+      if (response.data.url) {
+        window.location = response.data.url;
+      }
+    } catch (err) {
+      alert(err.response?.data?.error || 'Failed to process checkout. Please verify your details.');
     }
   }
 
@@ -233,13 +241,41 @@ export default function CartPage() {
   }
 
   const effectiveShipping = productsTotal >= 50000 ? 0 : (parseInt(shippingFee || 0, 10));
-  const discountAmount = discountApplied ? Math.round(productsTotal * 0.1) : 0;
+  
+  let discountAmount = 0;
+  if (discountApplied && discountInfo) {
+    if (discountInfo.discountPercent > 0) {
+      discountAmount = Math.round(productsTotal * (discountInfo.discountPercent / 100));
+    } else if (discountInfo.discountAmount > 0) {
+      discountAmount = Math.min(discountInfo.discountAmount, productsTotal);
+    }
+  } else if (discountApplied) {
+    discountAmount = Math.round(productsTotal * 0.1);
+  }
+
   const orderTotal = Math.max(0, productsTotal - discountAmount + effectiveShipping);
 
-  const handleApplyDiscount = (e) => {
+  const handleApplyDiscount = async (e) => {
     e.preventDefault();
-    if (discountCode.trim().toUpperCase() === 'PRECISION10') {
-      setDiscountApplied(true);
+    const cleanCode = discountCode.trim().toUpperCase();
+    if (!cleanCode) {
+      setDiscountError('Please enter a coupon code');
+      return;
+    }
+    setIsCheckingDiscount(true);
+    setDiscountError('');
+    try {
+      const res = await axios.get(`/api/coupons?code=${encodeURIComponent(cleanCode)}&total=${productsTotal}`);
+      if (res.data.valid) {
+        setDiscountApplied(true);
+        setDiscountInfo(res.data);
+      }
+    } catch (err) {
+      setDiscountApplied(false);
+      setDiscountInfo(null);
+      setDiscountError(err.response?.data?.message || 'Invalid or expired discount code');
+    } finally {
+      setIsCheckingDiscount(false);
     }
   };
 
@@ -338,7 +374,9 @@ export default function CartPage() {
                       </tr>
                       {discountApplied && (
                         <tr className="subtotal" style={{color: 'var(--color-success)'}}>
-                          <td colSpan={2}>Promo Code (PRECISION10 - 10%)</td>
+                          <td colSpan={2}>
+                            Promo Code ({discountInfo?.code || discountCode.toUpperCase()} {discountInfo?.discountPercent ? `• ${discountInfo.discountPercent}% off` : discountInfo?.discountAmount ? `• Rs. ${discountInfo.discountAmount.toLocaleString()} off` : '• 10% off'})
+                          </td>
                           <td>-{formatPrice(discountAmount)}</td>
                         </tr>
                       )}
@@ -364,13 +402,31 @@ export default function CartPage() {
                       type="text"
                       placeholder="Discount Code (e.g. PRECISION10)"
                       value={discountCode}
-                      onChange={(e) => setDiscountCode(e.target.value)}
+                      onChange={(e) => {
+                        setDiscountCode(e.target.value);
+                        if (discountError) setDiscountError('');
+                      }}
                       aria-label="Discount code"
                     />
-                    <Button primary outline onClick={handleApplyDiscount} type="button">
-                      {discountApplied ? "Applied ✓" : "Apply"}
+                    <Button
+                      primary
+                      outline
+                      onClick={discountApplied ? () => { setDiscountApplied(false); setDiscountInfo(null); setDiscountCode(''); } : handleApplyDiscount}
+                      type="button"
+                    >
+                      {isCheckingDiscount ? "Checking..." : discountApplied ? "Remove ✕" : "Apply"}
                     </Button>
                   </DiscountRow>
+                  {discountError && (
+                    <div style={{color: 'var(--color-accent, #C8472B)', fontSize: '0.85rem', marginTop: '6px', textAlign: 'right'}}>
+                      ✕ {discountError}
+                    </div>
+                  )}
+                  {discountApplied && (
+                    <div style={{color: 'var(--color-success, #2E7D4F)', fontSize: '0.85rem', marginTop: '6px', textAlign: 'right'}}>
+                      ✓ Promotional discount applied to your order!
+                    </div>
+                  )}
                 </>
               )}
             </Box>

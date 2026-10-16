@@ -2,6 +2,7 @@ import {mongooseConnect} from "@/lib/mongoose";
 const stripe = require('stripe')(process.env.STRIPE_SK);
 import {buffer} from 'micro';
 import {Order} from "@/models/Order";
+import {Product} from "@/models/Product";
 
 export default async function handler(req,res) {
   if (req.method !== 'POST') {
@@ -35,9 +36,24 @@ export default async function handler(req,res) {
       const orderId = data.metadata.orderId;
       const paid = data.payment_status === 'paid';
       if (orderId && paid) {
-        await Order.findByIdAndUpdate(orderId,{
-          paid:true,
-        })
+        const order = await Order.findByIdAndUpdate(orderId, {
+          paid: true,
+          status: 'processing',
+        });
+
+        // Decrement stock for purchased items
+        if (order?.line_items?.length) {
+          for (const item of order.line_items) {
+            const productName = item?.price_data?.product_data?.name?.split(' (')[0];
+            const qty = item.quantity || 1;
+            if (productName) {
+              await Product.updateOne(
+                { title: productName },
+                { $inc: { stock: -qty } }
+              );
+            }
+          }
+        }
       }
       break;
     default:
