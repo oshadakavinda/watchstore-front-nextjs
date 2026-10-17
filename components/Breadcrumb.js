@@ -50,7 +50,11 @@ const CurrentPage = styled.span`
 `;
 
 export default function Breadcrumb({ items = [] }) {
-  // items format: [{ label: 'Home', href: '/' }, { label: 'Watches', href: '/products' }, { label: 'Current' }]
+  // Prevent duplicate 'Home' if caller passes it in items
+  const cleanItems = items.filter(
+    (item, idx) => !(idx === 0 && (item.href === '/' || item.label?.toLowerCase() === 'home'))
+  );
+
   return (
     <Nav aria-label="Breadcrumb">
       <List itemScope itemType="https://schema.org/BreadcrumbList">
@@ -65,7 +69,7 @@ export default function Breadcrumb({ items = [] }) {
           <meta itemProp="position" content="1" />
         </ListItem>
 
-        {items.map((item, idx) => {
+        {cleanItems.map((item, idx) => {
           const isLast = idx === items.length - 1;
           const position = idx + 2;
 
