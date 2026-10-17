@@ -6,7 +6,7 @@ const StepperWrapper = styled.div`
   border: 1px solid var(--color-border, #cccccc);
   border-radius: var(--radius-sm, 5px);
   background-color: var(--color-surface, #ffffff);
-  height: ${props => props.size === 'sm' ? '34px' : '42px'};
+  height: ${props => (props.$size || props.size) === 'sm' ? '34px' : '42px'};
   overflow: hidden;
   box-sizing: border-box;
   transition: border-color 200ms ease;
@@ -19,7 +19,7 @@ const StepperWrapper = styled.div`
 const StepperButton = styled.button`
   background: transparent;
   border: 0;
-  width: ${props => props.size === 'sm' ? '32px' : '40px'};
+  width: ${props => (props.$size || props.size) === 'sm' ? '32px' : '40px'};
   height: 100%;
   font-size: 1.1rem;
   font-weight: 500;
@@ -42,7 +42,7 @@ const StepperButton = styled.button`
 `;
 
 const StepperInput = styled.input`
-  width: ${props => props.size === 'sm' ? '36px' : '46px'};
+  width: ${props => (props.$size || props.size) === 'sm' ? '36px' : '46px'};
   height: 100%;
   border: 0;
   text-align: center;
@@ -92,10 +92,10 @@ export default function QuantitySelector({
   };
 
   return (
-    <StepperWrapper size={size}>
+    <StepperWrapper $size={size}>
       <StepperButton
         type="button"
-        size={size}
+        $size={size}
         onClick={handleDecrement}
         disabled={disabled || value <= min}
         aria-label="Decrease quantity"
@@ -104,7 +104,7 @@ export default function QuantitySelector({
       </StepperButton>
       <StepperInput
         type="number"
-        size={size}
+        $size={size}
         value={value}
         min={min}
         max={max}
@@ -114,7 +114,7 @@ export default function QuantitySelector({
       />
       <StepperButton
         type="button"
-        size={size}
+        $size={size}
         onClick={handleIncrement}
         disabled={disabled || value >= max}
         aria-label="Increase quantity"

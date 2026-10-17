@@ -1,4 +1,5 @@
-import { createGlobalStyle } from "styled-components";
+import { createGlobalStyle, StyleSheetManager } from "styled-components";
+import isPropValid from "@emotion/is-prop-valid";
 import { CartContextProvider } from "@/components/CartContext";
 import { SessionProvider } from "next-auth/react";
 import AnnouncementBar from "@/components/AnnouncementBar";
@@ -170,15 +171,17 @@ export default function App({ Component, pageProps: { session, ...pageProps } })
         />
       )}
 
-      <SessionProvider session={session}>
-        <CartContextProvider>
-          <ErrorBoundary>
-            <AnnouncementBar />
-            <Component {...pageProps} />
-            <CartDrawer />
-          </ErrorBoundary>
-        </CartContextProvider>
-      </SessionProvider>
+      <StyleSheetManager shouldForwardProp={(propName, target) => (typeof target === 'string' ? isPropValid(propName) : true)}>
+        <SessionProvider session={session}>
+          <CartContextProvider>
+            <ErrorBoundary>
+              <AnnouncementBar />
+              <Component {...pageProps} />
+              <CartDrawer />
+            </ErrorBoundary>
+          </CartContextProvider>
+        </SessionProvider>
+      </StyleSheetManager>
     </>
   );
 }

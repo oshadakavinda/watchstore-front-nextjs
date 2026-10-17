@@ -25,7 +25,7 @@ const StyledProductsGrid = styled.div`
 
 export default function ProductsGrid({products,wishedProducts=[]}) {
   return (
-    <StyledProductsGrid interval={100}>
+    <StyledProductsGrid>
       {products?.length > 0 && products.map((product,index) => (
         <RevealWrapper key={product._id} delay={index*50}>
           <ProductBox {...product}

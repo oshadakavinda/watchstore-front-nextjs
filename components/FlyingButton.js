@@ -6,7 +6,7 @@ import { useContext, useRef } from "react";
 
 const FlyingButtonWrapper = styled.div`
   display: inline-block;
-  width: ${props => props.block ? '100%' : 'auto'};
+  width: ${props => (props.$block || props.block) ? '100%' : 'auto'};
 
   button {
     ${ButtonStyle};
@@ -17,7 +17,7 @@ const FlyingButtonWrapper = styled.div`
     padding: 8px 14px;
 
     ${(props) =>
-      props.main
+      (props.$main || props.main)
         ? `
       background-color: var(--color-primary, #0D3D29);
       border: 1px solid var(--color-primary, #0D3D29);
@@ -38,7 +38,7 @@ const FlyingButtonWrapper = styled.div`
     `}
 
     ${(props) =>
-      props.white &&
+      (props.$white || props.white) &&
       `
       background-color: var(--color-surface, #ffffff);
       border: 1px solid var(--color-border, #cccccc);
@@ -72,7 +72,16 @@ const FlyingButtonWrapper = styled.div`
   }
 `;
 
-export default function FlyingButton(props) {
+export default function FlyingButton({
+  children,
+  main,
+  white,
+  block,
+  _id,
+  src,
+  alt,
+  ...rest
+}) {
   const { addProduct } = useContext(CartContext);
   const imgRef = useRef();
 
@@ -92,13 +101,13 @@ export default function FlyingButton(props) {
 
   return (
     <FlyingButtonWrapper
-      white={props.white}
-      main={props.main}
-      block={props.block}
-      onClick={() => addProduct(props._id)}>
-      <img src={props.src} alt={props.alt || "Product image"} ref={imgRef} />
-      <button type="button" onClick={sendImageToCart} {...props}>
-        {props.children}
+      $white={white}
+      $main={main}
+      $block={block}
+      onClick={() => addProduct(_id)}>
+      <img src={src} alt={alt || "Product image"} ref={imgRef} />
+      <button type="button" onClick={sendImageToCart} {...rest}>
+        {children}
       </button>
     </FlyingButtonWrapper>
   );

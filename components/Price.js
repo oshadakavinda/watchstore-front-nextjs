@@ -9,13 +9,13 @@ const PriceWrapper = styled.div`
 `;
 
 const CurrentPrice = styled.span`
-  font-size: ${props => props.size === 'lg' ? '1.5rem' : props.size === 'sm' ? '0.875rem' : '1.125rem'};
+  font-size: ${props => (props.$size || props.size) === 'lg' ? '1.5rem' : (props.$size || props.size) === 'sm' ? '0.875rem' : '1.125rem'};
   font-weight: 600;
-  color: ${props => props.isSale ? 'var(--color-accent, #C8472B)' : 'var(--color-text, #1a1a1a)'};
+  color: ${props => (props.$isSale !== undefined ? props.$isSale : props.isSale) ? 'var(--color-accent, #C8472B)' : 'var(--color-text, #1a1a1a)'};
 `;
 
 const ComparePrice = styled.span`
-  font-size: ${props => props.size === 'lg' ? '1.1rem' : '0.85rem'};
+  font-size: ${props => (props.$size || props.size) === 'lg' ? '1.1rem' : '0.85rem'};
   font-weight: 400;
   text-decoration: line-through;
   color: var(--color-text-muted, #767676);
@@ -31,11 +31,11 @@ export default function Price({ price, comparePrice, size = 'md', currency = 'Rs
 
   return (
     <PriceWrapper>
-      <CurrentPrice size={size} isSale={isSale}>
+      <CurrentPrice $size={size} $isSale={isSale}>
         {formatPrice(price, currency)}
       </CurrentPrice>
       {isSale && (
-        <ComparePrice size={size}>
+        <ComparePrice $size={size}>
           {formatPrice(comparePrice, currency)}
         </ComparePrice>
       )}

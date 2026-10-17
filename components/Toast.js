@@ -23,8 +23,9 @@ const ToastWrapper = styled.div`
   padding: 14px 20px;
   border-radius: var(--radius-sm, 5px);
   background-color: ${props => {
-    if (props.type === 'error') return 'var(--color-error, #B3261E)';
-    if (props.type === 'success') return 'var(--color-success, #2E7D4F)';
+    const t = props.$type || props.type;
+    if (t === 'error') return 'var(--color-error, #B3261E)';
+    if (t === 'success') return 'var(--color-success, #2E7D4F)';
     return 'var(--color-primary, #0D3D29)';
   }};
   color: #ffffff;
@@ -64,7 +65,7 @@ export default function Toast({ message, type = 'success', onClose, duration = 3
   if (!message) return null;
 
   return (
-    <ToastWrapper type={type} role="status" aria-live="polite">
+    <ToastWrapper $type={type} role="status" aria-live="polite">
       <span>{message}</span>
       {onClose && (
         <CloseButton type="button" onClick={onClose} aria-label="Close notification">

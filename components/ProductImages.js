@@ -39,7 +39,7 @@ const ImageButtons = styled.div`
 
 const ImageButton = styled.button`
   background: #fafafa;
-  border: 2px solid ${props => (props.active ? 'var(--color-primary, #0D3D29)' : 'var(--color-border, #cccccc)')};
+  border: 2px solid ${props => ((props.$active !== undefined ? props.$active : props.active) ? 'var(--color-primary, #0D3D29)' : 'var(--color-border, #cccccc)')};
   height: 56px;
   width: 56px;
   padding: 4px;
@@ -84,7 +84,7 @@ export default function ProductImages({images = [], title = "Product"}) {
             <ImageButton
               type="button"
               key={image}
-              active={image === currentImage}
+              $active={image === currentImage}
               onClick={() => setActiveImage(image)}
               aria-label={`View ${title} image ${index + 1}`}
               role="tab"

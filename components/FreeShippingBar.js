@@ -34,8 +34,8 @@ const ProgressTrack = styled.div`
 
 const ProgressBar = styled.div`
   height: 100%;
-  width: ${props => Math.min(props.percent, 100)}%;
-  background: ${props => props.unlocked
+  width: ${props => Math.min(props.$percent || props.percent || 0, 100)}%;
+  background: ${props => (props.$unlocked !== undefined ? props.$unlocked : props.unlocked)
     ? 'linear-gradient(90deg, #2E7D4F, #38a169)'
     : 'linear-gradient(90deg, var(--color-primary, #0D3D29), #206d4e)'};
   border-radius: 9999px;
@@ -60,7 +60,7 @@ export default function FreeShippingBar({ subtotal = 0, threshold = 50000 }) {
         <span style={{fontSize: '0.8rem', color: '#767676'}}>{Math.min(percent, 100)}%</span>
       </Message>
       <ProgressTrack>
-        <ProgressBar percent={percent} unlocked={unlocked} />
+        <ProgressBar $percent={percent} $unlocked={unlocked} />
       </ProgressTrack>
     </BarContainer>
   );

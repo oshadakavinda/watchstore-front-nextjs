@@ -14,8 +14,8 @@ const Overlay = styled.div`
   background-color: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(2px);
   z-index: 1000;
-  opacity: ${props => (props.open ? 1 : 0)};
-  visibility: ${props => (props.open ? 'visible' : 'hidden')};
+  opacity: ${props => (props.$open ? 1 : 0)};
+  visibility: ${props => (props.$open ? 'visible' : 'hidden')};
   transition: opacity 300ms ease, visibility 300ms ease;
 `;
 
@@ -31,7 +31,7 @@ const Drawer = styled.aside`
   box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
-  transform: translateX(${props => (props.open ? '0%' : '100%')});
+  transform: translateX(${props => (props.$open ? '0%' : '100%')});
   transition: transform 350ms cubic-bezier(0.16, 1, 0.3, 1);
   font-family: var(--font-body);
 `;
@@ -270,9 +270,9 @@ export default function CartDrawer() {
 
   return (
     <>
-      <Overlay open={isCartDrawerOpen} onClick={closeCartDrawer} />
+      <Overlay $open={isCartDrawerOpen} onClick={closeCartDrawer} />
       <Drawer
-        open={isCartDrawerOpen}
+        $open={isCartDrawerOpen}
         role="dialog"
         aria-modal="true"
         aria-label="Shopping Cart Drawer"
