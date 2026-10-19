@@ -35,9 +35,11 @@ export function CartContextProvider({children}) {
     }
   }, [cartProducts, isLoaded]);
 
-  function addProduct(productId) {
+  function addProduct(productId, openDrawer = true) {
     setCartProducts(prev => [...prev, productId]);
-    setIsCartDrawerOpen(true); // Open drawer when product added
+    if (openDrawer && typeof window !== "undefined" && window.location.pathname !== '/cart') {
+      setIsCartDrawerOpen(true); // Open drawer when product added, unless on /cart
+    }
   }
 
   function removeProduct(productId) {

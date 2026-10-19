@@ -213,7 +213,7 @@ export default function CartPage() {
   const handleQuantityChange = (productId, newQty, currentQty) => {
     const diff = newQty - currentQty;
     if (diff > 0) {
-      for (let i = 0; i < diff; i++) addProduct(productId);
+      for (let i = 0; i < diff; i++) addProduct(productId, false);
     } else if (diff < 0) {
       for (let i = 0; i < Math.abs(diff); i++) removeProduct(productId);
     }

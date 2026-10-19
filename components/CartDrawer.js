@@ -241,6 +241,13 @@ export default function CartDrawer() {
     };
   }, [isCartDrawerOpen]);
 
+  // Close drawer if user is on the cart page
+  useEffect(() => {
+    if (router.pathname === '/cart' && isCartDrawerOpen) {
+      closeCartDrawer();
+    }
+  }, [router.pathname, isCartDrawerOpen, closeCartDrawer]);
+
   // Unique product IDs in cart
   const uniqueIds = [...new Set(cartProducts)];
 
@@ -255,7 +262,7 @@ export default function CartDrawer() {
     const diff = newQty - currentQty;
     if (diff > 0) {
       for (let i = 0; i < diff; i++) {
-        addProduct(productId);
+        addProduct(productId, false);
       }
     } else if (diff < 0) {
       for (let i = 0; i < Math.abs(diff); i++) {
@@ -269,6 +276,11 @@ export default function CartDrawer() {
       removeProduct(productId);
     }
   };
+
+  // Never render cart drawer when on the cart page
+  if (router.pathname === '/cart') {
+    return null;
+  }
 
   return (
     <>
