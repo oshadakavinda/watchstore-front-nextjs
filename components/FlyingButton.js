@@ -47,6 +47,72 @@ const FlyingButtonWrapper = styled.div`
         background-color: #f7f7f7;
       }
     `}
+
+    ${(props) =>
+      (props.$whiteBox || props.whiteBox)
+        ? `
+      width: 38px !important;
+      height: 38px !important;
+      min-width: 38px !important;
+      min-height: 38px !important;
+      max-width: 38px !important;
+      max-height: 38px !important;
+      padding: 0 !important;
+      border-radius: 8px !important;
+      background-color: #ffffff !important;
+      border: 1px solid rgba(0, 0, 0, 0.12) !important;
+      color: #555555 !important;
+      display: inline-flex !important;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+      transition: all 180ms ease !important;
+
+      svg {
+        width: 20px;
+        height: 20px;
+        margin: 0;
+        stroke: currentColor;
+      }
+
+      &:hover {
+        background-color: #ffffff !important;
+        border-color: rgba(0, 0, 0, 0.28) !important;
+        color: #111111 !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      &:active {
+        transform: scale(0.95);
+      }
+    `
+        : (props.$icon || props.icon)
+        ? `
+      width: 40px !important;
+      height: 40px !important;
+      min-width: 40px !important;
+      min-height: 40px !important;
+      max-width: 40px !important;
+      max-height: 40px !important;
+      padding: 0 !important;
+      border-radius: 50% !important;
+      display: inline-flex !important;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+
+      svg {
+        width: 20px;
+        height: 20px;
+        margin: 0;
+      }
+
+      &:hover {
+        transform: scale(1.08);
+      }
+    `
+        : ``}
   }
 
   @keyframes fly {
@@ -76,7 +142,9 @@ export default function FlyingButton({
   children,
   main,
   white,
+  whiteBox,
   block,
+  icon,
   _id,
   src,
   alt,
@@ -103,7 +171,9 @@ export default function FlyingButton({
     <FlyingButtonWrapper
       $white={white}
       $main={main}
+      $whiteBox={whiteBox}
       $block={block}
+      $icon={icon}
       onClick={() => addProduct(_id)}>
       <img src={src} alt={alt || "Product image"} ref={imgRef} />
       <button type="button" onClick={sendImageToCart} {...rest}>

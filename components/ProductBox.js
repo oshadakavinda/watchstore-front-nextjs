@@ -1,9 +1,10 @@
 import styled from "styled-components";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import FlyingButton from "@/components/FlyingButton";
 import HeartOutlineIcon from "@/components/icons/HeartOutlineIcon";
 import HeartSolidIcon from "@/components/icons/HeartSolidIcon";
+import CartPlusIcon from "@/components/icons/CartPlusIcon";
 import Price from "@/components/Price";
 import Badge from "@/components/Badge";
 import axios from "axios";
@@ -143,22 +144,6 @@ const PriceRow = styled.div`
   justify-content: space-between;
   gap: 8px;
   margin-top: auto;
-  flex-wrap: wrap;
-
-  button {
-    text-align: center;
-    justify-content: center;
-  }
-
-  @media screen and (max-width: 480px) {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
-
-    button {
-      width: 100%;
-    }
-  }
 `;
 
 const SoldOutButton = styled.button`
@@ -166,8 +151,8 @@ const SoldOutButton = styled.button`
   color: #6b7280;
   border: 1px solid #d1d5db;
   border-radius: var(--radius-sm, 5px);
-  padding: 8px 16px;
-  font-size: 0.85rem;
+  padding: 6px 12px;
+  font-size: 0.8rem;
   font-weight: 600;
   cursor: not-allowed;
 `;
@@ -178,7 +163,12 @@ export default function ProductBox({
 }) {
   const url = '/product/' + _id;
   const [isWished, setIsWished] = useState(wished);
+  const [currentImg, setCurrentImg] = useState(images?.[0]);
   const isSoldOut = stock <= 0;
+
+  useEffect(() => {
+    setCurrentImg(images?.[0]);
+  }, [images]);
 
   function addToWishlist(ev) {
     ev.preventDefault();
@@ -214,7 +204,15 @@ export default function ProductBox({
         >
           {isWished ? <HeartSolidIcon /> : <HeartOutlineIcon />}
         </WishlistButton>
-        <img src={images?.[0]} alt={title || "Product image"} loading="lazy" />
+        <img
+          src={currentImg || images?.[0]}
+          alt={title || "Product image"}
+          onError={() => {
+            if (images && images.length > 1 && currentImg === images[0]) {
+              setCurrentImg(images[1]);
+            }
+          }}
+        />
       </ImageBox>
 
       <ProductInfoBox>
@@ -230,8 +228,15 @@ export default function ProductBox({
               Sold Out
             </SoldOutButton>
           ) : (
-            <FlyingButton _id={_id} src={images?.[0]} alt={title}>
-              Add to cart
+            <FlyingButton
+              _id={_id}
+              src={images?.[0]}
+              alt={title}
+              whiteBox={1}
+              aria-label={`Add ${title} to cart`}
+              title="Add to cart"
+            >
+              <CartPlusIcon />
             </FlyingButton>
           )}
         </PriceRow>

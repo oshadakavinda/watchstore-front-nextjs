@@ -6,20 +6,34 @@ export function CartContextProvider({children}) {
   const ls = typeof window !== "undefined" ? window.localStorage : null;
   const [cartProducts,setCartProducts] = useState([]);
   const [isCartDrawerOpen, setIsCartDrawerOpen] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    if (cartProducts?.length > 0) {
-      ls?.setItem('cart', JSON.stringify(cartProducts));
-    } else {
-      ls?.removeItem('cart');
-    }
-  }, [cartProducts]);
-
-  useEffect(() => {
-    if (ls && ls.getItem('cart')) {
-      setCartProducts(JSON.parse(ls.getItem('cart')));
+    if (ls) {
+      try {
+        const stored = ls.getItem('cart');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed)) {
+            setCartProducts(parsed);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load cart from localStorage:', err);
+      }
+      setIsLoaded(true);
     }
   }, []);
+
+  useEffect(() => {
+    if (!isLoaded || !ls) return;
+
+    if (cartProducts?.length > 0) {
+      ls.setItem('cart', JSON.stringify(cartProducts));
+    } else {
+      ls.removeItem('cart');
+    }
+  }, [cartProducts, isLoaded]);
 
   function addProduct(productId) {
     setCartProducts(prev => [...prev, productId]);

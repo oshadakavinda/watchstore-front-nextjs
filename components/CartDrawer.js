@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import {useContext, useEffect, useState} from "react";
+import {useRouter} from "next/router";
 import {CartContext} from "@/components/CartContext";
 import Link from "next/link";
 import axios from "axios";
@@ -195,6 +196,7 @@ const CartLink = styled(Link)`
 `;
 
 export default function CartDrawer() {
+  const router = useRouter();
   const {
     isCartDrawerOpen,
     closeCartDrawer,
@@ -365,7 +367,7 @@ export default function CartDrawer() {
               block
               onClick={() => {
                 closeCartDrawer();
-                window.location.href = '/cart';
+                router.push('/cart');
               }}
             >
               Checkout • {formatPrice(subtotal)}
