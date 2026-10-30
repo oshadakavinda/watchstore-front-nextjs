@@ -6,6 +6,7 @@ import {getServerSession} from "next-auth";
 import {authOptions} from "@/pages/api/auth/[...nextauth]";
 import {Setting} from "@/models/Setting";
 import { applyRateLimit, validateOrigin } from "@/lib/security";
+import { cancelExpiredOrders, initOrderCleanupTimer } from "@/lib/orderCleanup";
 const stripe = require('stripe')(process.env.STRIPE_SK);
 
 function isValidEmail(email) {
@@ -168,6 +169,10 @@ export default async function handler(req,res) {
     discount: totalDiscountAmount,
   });
 
+  // Run cleanup on stale unpaid checkouts
+  initOrderCleanupTimer();
+  cancelExpiredOrders().catch(() => {});
+
   const shippingFeeSetting = await Setting.findOne({ name: 'shippingFee' });
   const shippingFeeCents = parseInt(shippingFeeSetting?.value || '0') * 100;
 
@@ -177,6 +182,7 @@ export default async function handler(req,res) {
     customer_email: safeEmail,
     success_url: process.env.PUBLIC_URL + '/cart?success=1',
     cancel_url: process.env.PUBLIC_URL + '/cart?canceled=1',
+    expires_at: Math.floor(Date.now() / 1000) + (31 * 60), // Stripe Checkout automatically expires after 31 mins
     metadata: { orderId: orderDoc._id.toString() },
     allow_promotion_codes: true,
     shipping_options: [

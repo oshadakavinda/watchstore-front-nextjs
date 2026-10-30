@@ -162,15 +162,15 @@ export default function SingleOrder({ _id, line_items = [], createdAt, paid, sta
             backgroundColor: paid ? 'rgba(46, 125, 79, 0.12)' : 'rgba(200, 71, 43, 0.12)',
             color: paid ? '#2E7D4F' : '#C8472B',
           }}>
-            {paid ? 'PAID' : 'PAYMENT PENDING'}
+            {paid ? 'PAID' : status === 'cancelled' ? 'UNPAID / EXPIRED' : 'PAYMENT PENDING'}
           </span>
           <span style={{
             fontSize: '0.75rem',
             fontWeight: 600,
             padding: '2px 8px',
             borderRadius: '999px',
-            backgroundColor: status === 'delivered' ? '#dcfce7' : status === 'shipped' ? '#dbeafe' : '#fef3c7',
-            color: status === 'delivered' ? '#166534' : status === 'shipped' ? '#1e40af' : '#92400e',
+            backgroundColor: status === 'delivered' ? '#dcfce7' : status === 'shipped' ? '#dbeafe' : status === 'cancelled' ? '#fee2e2' : '#fef3c7',
+            color: status === 'delivered' ? '#166534' : status === 'shipped' ? '#1e40af' : status === 'cancelled' ? '#991b1b' : '#92400e',
             textTransform: 'capitalize',
           }}>
             {status}
@@ -178,21 +178,43 @@ export default function SingleOrder({ _id, line_items = [], createdAt, paid, sta
         </div>
       </OrderHeader>
 
-      {/* Fulfillment Status Progress Stepper */}
-      <StatusStepper>
-        <StepItem $active={true}>
-          <div className="step-icon">1</div>
-          <div className="step-label">Order Confirmed</div>
-        </StepItem>
-        <StepItem $active={isShipped}>
-          <div className="step-icon">2</div>
-          <div className="step-label">Courier In Transit</div>
-        </StepItem>
-        <StepItem $active={isDelivered}>
-          <div className="step-icon">3</div>
-          <div className="step-label">Delivered</div>
-        </StepItem>
-      </StatusStepper>
+      {/* Fulfillment Status Progress Stepper or Cancellation Banner */}
+      {status === 'cancelled' ? (
+        <div style={{
+          margin: '16px 0 20px',
+          padding: '12px 16px',
+          backgroundColor: '#fef2f2',
+          border: '1px solid #fecaca',
+          borderRadius: '8px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          color: '#991b1b',
+          fontSize: '0.82rem'
+        }}>
+          <svg style={{ width: '18px', height: '18px', flexShrink: 0 }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div>
+            <strong>Order Cancelled:</strong> {!paid ? 'Payment was not received within the 30-minute reservation window. Timepiece reservation has been released.' : 'This order has been cancelled.'}
+          </div>
+        </div>
+      ) : (
+        <StatusStepper>
+          <StepItem $active={true}>
+            <div className="step-icon">1</div>
+            <div className="step-label">Order Confirmed</div>
+          </StepItem>
+          <StepItem $active={isShipped}>
+            <div className="step-icon">2</div>
+            <div className="step-label">Courier In Transit</div>
+          </StepItem>
+          <StepItem $active={isDelivered}>
+            <div className="step-icon">3</div>
+            <div className="step-label">Delivered</div>
+          </StepItem>
+        </StatusStepper>
+      )}
 
       {trackingNumber && (
         <TrackingBanner>

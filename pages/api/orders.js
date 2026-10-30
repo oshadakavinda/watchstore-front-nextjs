@@ -2,6 +2,7 @@ import {mongooseConnect} from "@/lib/mongoose";
 import {getServerSession} from "next-auth";
 import {authOptions} from "@/pages/api/auth/[...nextauth]";
 import {Order} from "@/models/Order";
+import {cancelExpiredOrders, initOrderCleanupTimer} from "@/lib/orderCleanup";
 
 export default async function handle(req, res) {
   if (req.method !== 'GET') {
@@ -10,6 +11,10 @@ export default async function handle(req, res) {
   }
 
   await mongooseConnect();
+
+  // Auto-cancel any unpaid orders older than 30 minutes
+  initOrderCleanupTimer();
+  await cancelExpiredOrders();
 
   const session = await getServerSession(req, res, authOptions);
   if (!session?.user?.email) {

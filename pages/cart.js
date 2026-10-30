@@ -517,6 +517,9 @@ export default function CartPage() {
                 >
                   Continue to Secure Payment • {formatPrice(orderTotal)}
                 </Button>
+                <p style={{ fontSize: '0.75rem', color: '#64748b', textAlign: 'center', marginTop: '10px' }}>
+                  Orders automatically expire and cancel after 30 minutes if payment is not completed.
+                </p>
               </Box>
             </RevealWrapper>
           )}

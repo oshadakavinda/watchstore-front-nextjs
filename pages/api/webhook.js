@@ -56,6 +56,18 @@ export default async function handler(req,res) {
         }
       }
       break;
+    case 'checkout.session.expired':
+    case 'checkout.session.async_payment_failed': {
+      const data = event.data.object;
+      const orderId = data?.metadata?.orderId;
+      if (orderId) {
+        await Order.findOneAndUpdate(
+          { _id: orderId, paid: false },
+          { status: 'cancelled' }
+        );
+      }
+      break;
+    }
     default:
       break;
   }
