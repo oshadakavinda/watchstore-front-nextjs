@@ -394,10 +394,10 @@ export default function ComparePage({ allProducts = [] }) {
                           <option key={p._id} value={p._id}>{p.title}</option>
                         ))}
                       </select>
-                      <Link href={`/product/${watch._id}`} className="image-wrapper">
+                      <Link href={`/product/${watch.slug || watch._id}`} className="image-wrapper">
                         <img src={watch.images?.[0]} alt={watch.title} />
                       </Link>
-                      <Link href={`/product/${watch._id}`} className="title">
+                      <Link href={`/product/${watch.slug || watch._id}`} className="title">
                         {watch.title}
                       </Link>
                     </WatchHeaderCell>

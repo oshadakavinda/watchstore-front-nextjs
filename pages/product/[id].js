@@ -274,6 +274,7 @@ export default function ProductPage({ product, relatedProducts = [] }) {
   return (
     <>
       <Head>
+        <link rel="canonical" href={`https://watchstore.luxury/product/${product.slug || product._id}`} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
@@ -401,13 +402,20 @@ export async function getServerSideProps(context) {
   await mongooseConnect();
 
   const { id } = context.query;
-  if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+  if (!id) {
     return {
       notFound: true,
     };
   }
 
-  const product = await Product.findById(id).lean();
+  let product = null;
+  if (mongoose.Types.ObjectId.isValid(id)) {
+    product = await Product.findById(id).lean();
+  }
+
+  if (!product) {
+    product = await Product.findOne({ slug: String(id).toLowerCase() }).lean();
+  }
 
   if (!product) {
     return {
@@ -416,7 +424,7 @@ export async function getServerSideProps(context) {
   }
 
   // Fetch related products
-  const relatedFilter = { _id: { $ne: id } };
+  const relatedFilter = { _id: { $ne: product._id } };
   if (product.category) {
     relatedFilter.category = product.category;
   }

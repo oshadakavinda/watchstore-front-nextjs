@@ -339,7 +339,7 @@ export default function CartDrawer() {
                     </ItemImage>
                     <ItemInfo>
                       <div>
-                        <ItemTitle href={`/product/${product._id}`} onClick={closeCartDrawer}>
+                        <ItemTitle href={`/product/${product.slug || product._id}`} onClick={closeCartDrawer}>
                           {product.title}
                         </ItemTitle>
                         <Price price={product.price} size="sm" />

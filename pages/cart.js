@@ -343,11 +343,11 @@ export default function CartPage() {
                         return (
                           <tr key={product._id}>
                             <ProductInfoCell>
-                              <ProductImageBox href={`/product/${product._id}`}>
+                              <ProductImageBox href={`/product/${product.slug || product._id}`}>
                                 <img src={product.images?.[0]} alt={product.title} />
                               </ProductImageBox>
                               <div>
-                                <ProductTitleLink href={`/product/${product._id}`}>
+                                <ProductTitleLink href={`/product/${product.slug || product._id}`}>
                                   {product.title}
                                 </ProductTitleLink>
                                 <div style={{fontSize: '0.85rem', color: '#767676', marginTop: '4px'}}>

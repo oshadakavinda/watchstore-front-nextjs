@@ -9,7 +9,6 @@ import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { Setting } from "@/models/Setting";
 import Center from "@/components/Center";
 import TrustStrip from "@/components/TrustStrip";
-import NewsletterSignup from "@/components/NewsletterSignup";
 import RecentlyViewed from "@/components/RecentlyViewed";
 import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
@@ -29,7 +28,6 @@ export default function HomePage({ featuredProduct, newProducts, wishedNewProduc
       <NewProducts products={newProducts} wishedProducts={wishedNewProducts} />
       <Center>
         <RecentlyViewed />
-        <NewsletterSignup />
       </Center>
       <Footer />
     </div>

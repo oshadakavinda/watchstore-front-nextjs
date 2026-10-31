@@ -9,6 +9,7 @@ const ProductSchema = new Schema({
   category: {type:mongoose.Types.ObjectId, ref:'Category'},
   properties: {type:Object},
   stock: {type: Number, default: 10},
+  slug: {type: String, index: true},
 }, {
   timestamps: true,
 });

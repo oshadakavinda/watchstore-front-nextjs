@@ -160,8 +160,9 @@ const SoldOutButton = styled.button`
 export default function ProductBox({
   _id, title, description, price, comparePrice, images, wished = false,
   badge, stock = 10, rating = 0, reviewsCount = 0, onRemoveFromWishlist = () => {},
+  slug,
 }) {
-  const url = '/product/' + _id;
+  const url = '/product/' + (slug || _id);
   const [isWished, setIsWished] = useState(wished);
   const [currentImg, setCurrentImg] = useState(images?.[0]);
   const isSoldOut = stock <= 0;
@@ -185,7 +186,7 @@ export default function ProductBox({
 
   return (
     <ProductWrapper>
-      <ImageBox href={url}>
+      <ImageBox href={url} tabIndex={-1} aria-hidden="true">
         <BadgeContainer>
           {isSoldOut ? (
             <Badge variant="danger">Sold Out</Badge>

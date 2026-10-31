@@ -7,7 +7,7 @@ export async function getServerSideProps({ res }) {
 
   const baseUrl = process.env.PUBLIC_URL || 'https://watchstore.luxury';
 
-  const products = await Product.find({}, '_id updatedAt').lean();
+  const products = await Product.find({}, '_id slug updatedAt').lean();
   const categories = await Category.find({}, '_id updatedAt').lean();
 
   const staticPages = [
@@ -34,7 +34,7 @@ export async function getServerSideProps({ res }) {
   ${products
     .map(p => `
     <url>
-      <loc>${baseUrl}/product/${p._id}</loc>
+      <loc>${baseUrl}/product/${p.slug || p._id}</loc>
       <lastmod>${new Date(p.updatedAt || Date.now()).toISOString().split('T')[0]}</lastmod>
       <changefreq>weekly</changefreq>
       <priority>0.9</priority>
