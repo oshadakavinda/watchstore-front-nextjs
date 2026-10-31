@@ -301,6 +301,18 @@ const WishlistBadge = styled.span`
   line-height: 1.4;
 `;
 
+const SrOnly = styled.span`
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+`;
+
 export default function Header() {
   const { cartProducts } = useContext(CartContext);
   const { data: session } = useSession();
@@ -413,15 +425,18 @@ export default function Header() {
           </StyledNav>
 
           <SideIcons>
-            <Link href={'/search'} aria-label="Search products">
+            <Link href={'/search'} aria-label="Search timepieces">
               <SearchIcon />
+              <SrOnly>Search</SrOnly>
             </Link>
-            <Link href={'/account'} aria-label="View Wishlist">
+            <Link href={'/account'} aria-label="Account and Wishlist">
               <HeartOutlineIcon />
+              <SrOnly>Wishlist</SrOnly>
               {wishlistCount > 0 && <WishlistBadge>{wishlistCount}</WishlistBadge>}
             </Link>
             <Link href={'/cart'} aria-label={`Shopping cart with ${cartProducts.length} items`}>
               <CartIcon />
+              <SrOnly>Cart</SrOnly>
               {cartProducts.length > 0 && <CartBadge>{cartProducts.length}</CartBadge>}
             </Link>
           </SideIcons>

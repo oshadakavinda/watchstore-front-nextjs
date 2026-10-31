@@ -371,34 +371,51 @@ export default function ProductReviews({ productId }) {
       )}
 
       {/* Aggregate Score Overview */}
-      <RatingOverview>
-        <ScoreBox>
-          <div className="big-score">{averageRating > 0 ? averageRating : '5.0'}</div>
-          <div className="stars">
-            {'★'.repeat(Math.round(averageRating || 5))}
-            {'☆'.repeat(5 - Math.round(averageRating || 5))}
-          </div>
-          <div className="count">
-            Based on {totalReviews} {totalReviews === 1 ? 'collector review' : 'collector reviews'}
-          </div>
-        </ScoreBox>
+      {totalReviews > 0 ? (
+        <RatingOverview>
+          <ScoreBox>
+            <div className="big-score">{Number(averageRating).toFixed(1)}</div>
+            <div className="stars">
+              {'★'.repeat(Math.min(5, Math.max(1, Math.round(averageRating))))}
+              {'☆'.repeat(Math.max(0, 5 - Math.min(5, Math.max(1, Math.round(averageRating)))))}
+            </div>
+            <div className="count">
+              Based on {totalReviews} {totalReviews === 1 ? 'collector review' : 'collector reviews'}
+            </div>
+          </ScoreBox>
 
-        <BarsContainer>
-          {[5, 4, 3, 2, 1].map(stars => {
-            const count = breakdown[stars] || 0;
-            const pct = totalReviews > 0 ? Math.round((count / totalReviews) * 100) : (stars === 5 ? 100 : 0);
-            return (
-              <BarRow key={stars}>
-                <span className="label">{stars} stars</span>
-                <div className="bar-bg">
-                  <div className="bar-fill" style={{ width: `${pct}%` }} />
-                </div>
-                <span className="bar-count">{count}</span>
-              </BarRow>
-            );
-          })}
-        </BarsContainer>
-      </RatingOverview>
+          <BarsContainer>
+            {[5, 4, 3, 2, 1].map(stars => {
+              const count = breakdown[stars] || 0;
+              const pct = Math.round((count / totalReviews) * 100);
+              return (
+                <BarRow key={stars}>
+                  <span className="label">{stars} stars</span>
+                  <div className="bar-bg">
+                    <div className="bar-fill" style={{ width: `${pct}%` }} />
+                  </div>
+                  <span className="bar-count">{count}</span>
+                </BarRow>
+              );
+            })}
+          </BarsContainer>
+        </RatingOverview>
+      ) : (
+        <div style={{
+          textAlign: 'center',
+          padding: '36px 20px',
+          background: '#fcfcfc',
+          borderRadius: '8px',
+          border: '1px dashed #e2e8f0',
+          marginBottom: '32px'
+        }}>
+          <div style={{ fontSize: '1.4rem', color: '#cbd5e1', marginBottom: '8px' }}>☆☆☆☆☆</div>
+          <p style={{ margin: '0 0 6px', fontWeight: 600, color: '#1a1a1a', fontSize: '1rem' }}>No reviews yet</p>
+          <p style={{ margin: 0, color: '#64748b', fontSize: '0.85rem' }}>
+            Be the first collector to review this timepiece and share your experience with the community.
+          </p>
+        </div>
+      )}
 
       {/* Reviews List */}
       <ReviewsList>

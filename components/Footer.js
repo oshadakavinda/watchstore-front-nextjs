@@ -211,7 +211,7 @@ export default function Footer() {
               <li><FooterLink href="/returns">Delivery & Returns Policy</FooterLink></li>
               <li><FooterLink href="/terms">Terms of Service</FooterLink></li>
               <li><FooterLink href="/privacy">Privacy & Security</FooterLink></li>
-              <li><FooterLink href="/account">Order Tracking</FooterLink></li>
+              <li><FooterLink href="/account?tab=Orders">Order Tracking</FooterLink></li>
             </LinkList>
           </Column>
 

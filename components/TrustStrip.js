@@ -69,7 +69,7 @@ export default function TrustStrip({ compact = false }) {
         </IconCircle>
         <TextBlock>
           <ItemTitle>Free Insured Shipping</ItemTitle>
-          <ItemDesc>On all domestic & global orders</ItemDesc>
+          <ItemDesc>On orders over Rs. 10,000</ItemDesc>
         </TextBlock>
       </TrustItem>
 

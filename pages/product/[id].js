@@ -1,6 +1,7 @@
 import Center from "@/components/Center";
 import Title from "@/components/Title";
 import Header from "@/components/Header";
+import mongoose from "mongoose";
 import { mongooseConnect } from "@/lib/mongoose";
 import { Product } from "@/models/Product";
 import WhiteBox from "@/components/WhiteBox";
@@ -183,6 +184,31 @@ export default function ProductPage({ product, relatedProducts = [] }) {
     }));
   };
 
+  // Filter out any test/junk attributes (e.g. "oo: ioo" or single-letter test keys)
+  const validProperties = Object.entries(product.properties || {}).filter(([k, v]) => {
+    if (!k || !v) return false;
+    const cleanK = String(k).trim().toLowerCase();
+    const cleanV = String(v).trim().toLowerCase();
+    if (cleanK === 'oo' || cleanV === 'ioo') return false;
+    if (cleanK.length < 2 || cleanV.length < 2) return false;
+    return true;
+  });
+
+  // Only consider true wearable options as selectable variants
+  const variantKeys = ['color', 'colour', 'strap', 'strap material', 'band', 'size', 'dial color'];
+  const selectableVariants = validProperties.filter(([k]) =>
+    variantKeys.includes(String(k).trim().toLowerCase())
+  );
+
+  function truncateDescription(text, maxLength = 155) {
+    if (!text) return '';
+    const clean = text.replace(/\s+/g, ' ').trim();
+    if (clean.length <= maxLength) return clean;
+    const sliced = clean.slice(0, maxLength);
+    const lastSpace = sliced.lastIndexOf(' ');
+    return (lastSpace > 40 ? sliced.slice(0, lastSpace) : sliced) + '...';
+  }
+
   const productSchema = {
     "@context": "https://schema.org/",
     "@type": "Product",
@@ -191,7 +217,7 @@ export default function ProductPage({ product, relatedProducts = [] }) {
     "description": product.description,
     "brand": {
       "@type": "Brand",
-      "name": "WatchStore Luxury Timepieces"
+      "name": product.properties?.Brand || "WatchStore"
     },
     "offers": {
       "@type": "Offer",
@@ -199,45 +225,47 @@ export default function ProductPage({ product, relatedProducts = [] }) {
       "price": product.price,
       "availability": isSoldOut ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
       "itemCondition": "https://schema.org/NewCondition"
-    },
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.9",
-      "reviewCount": "24"
     }
   };
 
   const accordionItems = [
     {
-      title: "Specifications & Horological Heritage",
+      title: "Specifications & Technical Details",
       content: (
         <div>
-          <p>{product.description}</p>
-          <ul style={{paddingLeft: '20px', margin: '10px 0', lineHeight: '1.8'}}>
-            <li>Case Diameter: 41mm hand-polished 316L stainless steel or precious alloy</li>
-            <li>Movement: High-beat chronometer grade automatic caliber (28,800 vph)</li>
-            <li>Glass: Domed scratch-resistant sapphire crystal with anti-reflective coating</li>
-            <li>Water Resistance: 100 meters / 10 ATM tested pressure resistance</li>
-            {Object.entries(product.properties || {}).map(([k, v]) => (
-              <li key={k}>{k.charAt(0).toUpperCase() + k.slice(1)}: {v}</li>
-            ))}
-          </ul>
+          <p style={{marginBottom: '12px', lineHeight: '1.6'}}>{product.description}</p>
+          {validProperties.length > 0 ? (
+            <ul style={{paddingLeft: '20px', margin: '10px 0', lineHeight: '1.8'}}>
+              {validProperties.map(([k, v]) => (
+                <li key={k}>
+                  <strong>{k.charAt(0).toUpperCase() + k.slice(1)}:</strong> {v}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <ul style={{paddingLeft: '20px', margin: '10px 0', lineHeight: '1.8'}}>
+              <li><strong>Category:</strong> Fine Men&apos;s / Women&apos;s Timepiece</li>
+              <li><strong>Movement:</strong> Precision Caliber Movement</li>
+              <li><strong>Case & Strap:</strong> High-Durability Materials</li>
+              <li><strong>Water Resistance:</strong> Standard Daily Splash Resistance</li>
+            </ul>
+          )}
         </div>
       ),
     },
     {
-      title: "Complimentary Insured Courier & Returns",
+      title: "Insured Courier & Delivery Policy",
       content: (
-        <p>
-          Complimentary priority courier transit with full insurance guarantee. Acquisitions dispatched in bespoke velvet gift packaging. Enjoy our 30-day inspection privilege.
+        <p style={{lineHeight: '1.6'}}>
+          Free insured courier delivery on orders over Rs. 10,000 (flat Rs. 299 delivery on orders below). Each timepiece is safely packaged in protective watch presentation packaging. Enjoy our 30-day inspection privilege for unworn items with intact tags.
         </p>
       ),
     },
     {
-      title: "Authenticity Certificate & 2-Year International Warranty",
+      title: "Authenticity & 2-Year Official Warranty",
       content: (
-        <p>
-          Accompanied by an embossed certificate of origin, individual serial number record, and an official 2-year warranty card covering precision servicing and movement regulation.
+        <p style={{lineHeight: '1.6'}}>
+          100% genuine guaranteed with authentic brand packaging and serial verification. Backed by an official 2-year warranty covering precision movement reliability and manufacturing defects.
         </p>
       ),
     },
@@ -252,8 +280,8 @@ export default function ProductPage({ product, relatedProducts = [] }) {
         />
       </Head>
       <SEO
-        title={`${product.title} — WatchStore Luxury Horology`}
-        description={product.description?.slice(0, 155)}
+        title={`${product.title} — WatchStore`}
+        description={truncateDescription(product.description, 155)}
         ogImage={product.images?.[0]}
       />
       <Header />
@@ -298,9 +326,9 @@ export default function ProductPage({ product, relatedProducts = [] }) {
             </ProductDescription>
 
             {/* Interactive Variant Selectors */}
-            {product.properties && Object.keys(product.properties).length > 0 && (
+            {selectableVariants && selectableVariants.length > 0 && (
               <div>
-                {Object.entries(product.properties).map(([propName, propVal]) => (
+                {selectableVariants.map(([propName, propVal]) => (
                   <VariantGroup key={propName}>
                     <label>{propName}: {selectedVariants[propName] || propVal}</label>
                     <VariantPills>
@@ -373,6 +401,12 @@ export async function getServerSideProps(context) {
   await mongooseConnect();
 
   const { id } = context.query;
+  if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+    return {
+      notFound: true,
+    };
+  }
+
   const product = await Product.findById(id).lean();
 
   if (!product) {

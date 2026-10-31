@@ -7,6 +7,7 @@ import WhiteBox from "@/components/WhiteBox";
 import { RevealWrapper } from "@/components/RevealWrapper";
 import Input from "@/components/Input";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import axios from "axios";
 import Spinner from "@/components/Spinner";
 import ProductBox from "@/components/ProductBox";
@@ -81,6 +82,18 @@ export default function AccountPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [isEditable, setIsEditable] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const router = useRouter();
+
+  useEffect(() => {
+    if (router.query.tab) {
+      const qTab = String(router.query.tab).toLowerCase();
+      if (qTab === 'wishlist') {
+        setActiveTab('Wishlist');
+      } else if (qTab === 'orders') {
+        setActiveTab('Orders');
+      }
+    }
+  }, [router.query.tab]);
 
   async function logout() {
     await signOut({

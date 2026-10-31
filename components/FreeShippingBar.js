@@ -42,7 +42,7 @@ const ProgressBar = styled.div`
   transition: width 400ms cubic-bezier(0.4, 0, 0.2, 1);
 `;
 
-export default function FreeShippingBar({ subtotal = 0, threshold = 50000 }) {
+export default function FreeShippingBar({ subtotal = 0, threshold = 10000 }) {
   const remaining = threshold - subtotal;
   const percent = Math.round((subtotal / threshold) * 100);
   const unlocked = remaining <= 0;

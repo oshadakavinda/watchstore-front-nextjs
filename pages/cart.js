@@ -240,7 +240,7 @@ export default function CartPage() {
     productsTotal += price;
   }
 
-  const effectiveShipping = productsTotal >= 50000 ? 0 : (parseInt(shippingFee || 0, 10));
+  const effectiveShipping = productsTotal >= 10000 ? 0 : (parseInt(shippingFee || 0, 10));
   
   let discountAmount = 0;
   if (discountApplied && discountInfo) {
@@ -312,7 +312,7 @@ export default function CartPage() {
           <RevealWrapper delay={0}>
             <Box>
               <h2>Your Shopping Bag</h2>
-              <FreeShippingBar subtotal={productsTotal} threshold={50000} />
+              <FreeShippingBar subtotal={productsTotal} threshold={10000} />
 
               {!cartProducts?.length && (
                 <EmptyCartState>

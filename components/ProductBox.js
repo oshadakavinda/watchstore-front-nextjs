@@ -159,7 +159,7 @@ const SoldOutButton = styled.button`
 
 export default function ProductBox({
   _id, title, description, price, comparePrice, images, wished = false,
-  badge, stock = 10, onRemoveFromWishlist = () => {},
+  badge, stock = 10, rating = 0, reviewsCount = 0, onRemoveFromWishlist = () => {},
 }) {
   const url = '/product/' + _id;
   const [isWished, setIsWished] = useState(wished);
@@ -216,10 +216,12 @@ export default function ProductBox({
       </ImageBox>
 
       <ProductInfoBox>
-        <RatingRow>
-          <span className="stars">★★★★★</span>
-          <span>4.9</span>
-        </RatingRow>
+        {reviewsCount > 0 && rating > 0 && (
+          <RatingRow>
+            <span className="stars">{'★'.repeat(Math.min(5, Math.max(1, Math.round(rating))))}</span>
+            <span>{rating.toFixed(1)}</span>
+          </RatingRow>
+        )}
         <Title href={url}>{title}</Title>
         <PriceRow>
           <Price price={price} comparePrice={comparePrice} />

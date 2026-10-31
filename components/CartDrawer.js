@@ -305,7 +305,7 @@ export default function CartDrawer() {
         </DrawerHeader>
 
         <DrawerBody>
-          <FreeShippingBar subtotal={subtotal} threshold={50000} />
+          <FreeShippingBar subtotal={subtotal} threshold={10000} />
 
           {uniqueIds.length === 0 ? (
             <EmptyState>

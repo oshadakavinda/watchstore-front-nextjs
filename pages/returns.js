@@ -66,9 +66,9 @@ export default function ReturnsPage() {
             Every order placed before 2:00 PM is processed and dispatched on the same business day. We partner with specialized armored and priority courier services to guarantee timely and secure delivery:
           </p>
           <ul>
-            <li><strong>Complimentary Delivery:</strong> Orders exceeding Rs. 50,000 enjoy complimentary fully insured courier dispatch.</li>
-            <li><strong>Full Transit Insurance:</strong> All packages are insured for 100% of their invoice value until signed for by the verified collector.</li>
-            <li><strong>Signature Verification:</strong> All deliveries require a signature and government-issued ID upon receipt.</li>
+            <li><strong>Complimentary Delivery:</strong> Orders exceeding Rs. 10,000 enjoy complimentary insured delivery (standard insured flat rate of Rs. 299 for smaller orders).</li>
+            <li><strong>Full Transit Insurance:</strong> All packages are insured for 100% of their invoice value until signed for upon delivery.</li>
+            <li><strong>Proof of Delivery:</strong> Deliveries require a direct signature upon receipt.</li>
           </ul>
 
           <h2>2. The 30-Day Inspection Privilege</h2>

@@ -45,39 +45,39 @@ export default function FAQPage() {
       title: "How do you guarantee the authenticity of timepieces?",
       content: (
         <p>
-          Every timepiece curated by WatchStore is inspected and certified by master horologists. We source exclusively from verified luxury manufacturers and authorized distribution networks. Each watch arrives accompanied by an embossed certificate of origin, verifiable reference serial documentation, and its manufacturer warranty booklet.
+          Every timepiece curated by WatchStore is inspected for quality and genuine build. We source directly from verified brand distribution channels and authorized partners. Each watch arrives brand new in official packaging accompanied by its original documentation and warranty card.
         </p>
       ),
     },
     {
-      title: "What does the 2-Year International Warranty cover?",
+      title: "What does the warranty cover?",
       content: (
         <p>
-          Our official 2-year warranty covers all internal mechanical movement defects, chronometer regulation irregularities, and manufacturing anomalies under normal collector wear. In the unlikely event of servicing requirements, our concierge coordinates insured express transit to certified Swiss and German caliber ateliers.
+          Our warranty covers all internal movement defects and manufacturing anomalies under normal everyday wear. In the unlikely event of an issue, our support team facilitates prompt servicing or replacement through authorized service partners.
         </p>
       ),
     },
     {
-      title: "How are high-value watch shipments handled?",
+      title: "How are watch shipments handled?",
       content: (
         <p>
-          All orders are dispatched via armored or priority courier with 100% declared transit insurance. Shipments require government-issued photo ID and adult signature upon handover. Dispatches occur within 24 business hours in tamper-evident discreet packaging.
+          All orders are dispatched via trusted courier services in secure, protective packaging with tracking. Orders over Rs. 10,000 enjoy complimentary insured delivery, while smaller orders incur a flat Rs. 299 delivery fee. Dispatches typically occur within 24 business hours.
         </p>
       ),
     },
     {
-      title: "What is your 30-Day Inspection and Return Privilege?",
+      title: "What is your 30-Day Return Policy?",
       content: (
         <p>
-          We offer an unconditional 30-day inspection privilege. If your timepiece does not exceed your expectations, return it in pristine, unworn condition with factory protective films and original box for a full refund or exchange.
+          We offer a hassle-free 30-day inspection window. If your watch does not meet your expectations, you may return it in unworn, pristine condition with protective plastics intact and in original packaging for an exchange or full refund.
         </p>
       ),
     },
     {
-      title: "How should I care for an automatic mechanical watch?",
+      title: "How should I care for my watch?",
       content: (
         <p>
-          We recommend winding your automatic timepiece manually (20–30 crown rotations) when starting from rest. Keep away from magnetic fields exceeding 4,800 A/m (such as high-powered audio speakers and induction stovetops) to safeguard the hairspring, and service every 4 to 5 years.
+          For automatic watches, wind the crown 20–30 rotations before wear if starting from stopped. For quartz timepieces, batteries last between 1 to 3 years. Keep your watch away from strong magnetic fields and extreme temperatures to ensure long-term accuracy.
         </p>
       ),
     },
@@ -85,7 +85,7 @@ export default function FAQPage() {
       title: "Are your watches water resistant?",
       content: (
         <p>
-          Water resistance varies by model (typically 50m to 300m for diving calibers). All case crowns must be fully screwed down or depressed before exposure to moisture. Avoid hot showers or steam rooms as thermal expansion can degrade silicone and viton gaskets.
+          Water resistance varies by model — ranging from everyday splash resistance (30M / 3 ATM) to swimming ratings (50M–100M / 5–10 ATM). Please check each watch's specific rating on its product page. Ensure crowns are securely pushed or screwed down before exposure to water, and avoid hot showers or saunas.
         </p>
       ),
     },

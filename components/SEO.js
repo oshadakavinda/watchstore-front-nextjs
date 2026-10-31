@@ -8,6 +8,11 @@ export default function SEO({
 }) {
   const fullTitle = title.includes("WatchStore") ? title : `${title} | WatchStore`;
 
+  const baseUrl = process.env.NEXT_PUBLIC_URL || "https://watchstore.luxury";
+  const absoluteOgImage = ogImage.startsWith("http")
+    ? ogImage
+    : `${baseUrl.replace(/\/$/, '')}${ogImage.startsWith('/') ? '' : '/'}${ogImage}`;
+
   return (
     <Head>
       <title>{fullTitle}</title>
@@ -18,13 +23,13 @@ export default function SEO({
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={description} />
       <meta property="og:type" content={ogType} />
-      <meta property="og:image" content={ogImage} />
+      <meta property="og:image" content={absoluteOgImage} />
 
       {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={ogImage} />
+      <meta name="twitter:image" content={absoluteOgImage} />
     </Head>
   );
 }
