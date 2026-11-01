@@ -1,7 +1,7 @@
 import Link from "next/link";
 import styled from "styled-components";
 import Center from "@/components/Center";
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
 import { CartContext } from "@/components/CartContext";
@@ -171,15 +171,46 @@ const DrawerCloseButton = styled.button`
   }
 `;
 
+const NAV_ITEMS = [
+  { href: '/', label: 'Home' },
+  { href: '/products', label: 'All Products' },
+  { href: '/categories', label: 'Categories' },
+  { href: '/compare', label: 'Compare' },
+  { href: '/account', label: 'Account' },
+];
+
 const NavLinksContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 6px;
+  position: relative;
 
   @media screen and (min-width: 768px) {
     flex-direction: row;
     gap: 24px;
     align-items: center;
+  }
+`;
+
+const NavUnderline = styled.span`
+  display: none;
+
+  @media screen and (min-width: 768px) {
+    display: block;
+    position: absolute;
+    bottom: -2px;
+    height: 2px;
+    background-color: var(--color-primary, #0D3D29);
+    pointer-events: none;
+    border-radius: 2px;
+    will-change: left, width, opacity;
+    ${props => (props.$animate ? `
+      transition: left 240ms cubic-bezier(0.4, 0, 0.2, 1),
+                  width 240ms cubic-bezier(0.4, 0, 0.2, 1),
+                  opacity 180ms ease;
+    ` : `
+      transition: opacity 180ms ease;
+    `)}
   }
 `;
 
@@ -207,23 +238,6 @@ const NavLink = styled(Link)`
     font-size: 0.95rem;
     background-color: transparent !important;
     border-radius: 0;
-
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: -2px;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background-color: var(--color-primary, #0D3D29);
-      transform: scaleX(${props => (props.$active ? '1' : '0')});
-      transform-origin: left;
-      transition: transform 200ms ease-out;
-    }
-
-    &:hover::after {
-      transform: scaleX(1);
-    }
   }
 `;
 
@@ -318,11 +332,17 @@ export default function Header() {
   const { data: session } = useSession();
   const [wishlistCount, setWishlistCount] = useState(0);
   const [mobileNavActive, setMobileNavActive] = useState(false);
+  const [hoveredHref, setHoveredHref] = useState(null);
+  const [indicator, setIndicator] = useState({ left: 0, width: 0, opacity: 0 });
+  const [isReady, setIsReady] = useState(false);
+  const containerRef = useRef(null);
+  const linkRefs = useRef({});
   const router = useRouter();
 
   useEffect(() => {
-    // Close mobile nav on route change
+    // Close mobile nav on route change and clear hover
     setMobileNavActive(false);
+    setHoveredHref(null);
   }, [router.asPath]);
 
   // Lock body scroll when mobile nav is open
@@ -358,10 +378,63 @@ export default function Header() {
     }
   }, [session, router.asPath]);
 
-  const isActive = (path) => {
+  const isActive = useCallback((path) => {
     if (path === '/') return router.pathname === '/';
+    if (path === '/categories') return router.pathname.startsWith('/categories') || router.pathname.startsWith('/category');
+    if (path === '/products') return router.pathname.startsWith('/products') || router.pathname.startsWith('/product');
     return router.pathname.startsWith(path);
-  };
+  }, [router.pathname]);
+
+  const activeItem = NAV_ITEMS.find(item => isActive(item.href));
+  const activeHref = activeItem ? activeItem.href : null;
+  const targetHref = hoveredHref || activeHref;
+
+  const updateIndicator = useCallback(() => {
+    if (!targetHref) {
+      setIndicator(prev => ({ ...prev, opacity: 0 }));
+      return;
+    }
+
+    const el = linkRefs.current[targetHref];
+    const container = containerRef.current;
+    if (el && container) {
+      const containerRect = container.getBoundingClientRect();
+      const elRect = el.getBoundingClientRect();
+      const left = elRect.left - containerRect.left;
+      const width = elRect.width;
+
+      setIndicator({
+        left,
+        width,
+        opacity: 1,
+      });
+    } else {
+      setIndicator(prev => ({ ...prev, opacity: 0 }));
+    }
+  }, [targetHref]);
+
+  useEffect(() => {
+    updateIndicator();
+    const frame = requestAnimationFrame(() => {
+      setIsReady(true);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [updateIndicator]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      updateIndicator();
+    };
+    window.addEventListener('resize', handleResize);
+
+    if (typeof document !== 'undefined' && document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(updateIndicator);
+    }
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [updateIndicator]);
 
   return (
     <StyledHeader>
@@ -401,22 +474,42 @@ export default function Header() {
               </DrawerCloseButton>
             </DrawerHeader>
 
-            <NavLinksContainer>
-              <NavLink href={'/'} $active={isActive('/')} onClick={() => setMobileNavActive(false)}>
-                Home
-              </NavLink>
-              <NavLink href={'/products'} $active={isActive('/products')} onClick={() => setMobileNavActive(false)}>
-                All Products
-              </NavLink>
-              <NavLink href={'/categories'} $active={isActive('/categories')} onClick={() => setMobileNavActive(false)}>
-                Categories
-              </NavLink>
-              <NavLink href={'/compare'} $active={isActive('/compare')} onClick={() => setMobileNavActive(false)}>
-                Compare
-              </NavLink>
-              <NavLink href={'/account'} $active={isActive('/account')} onClick={() => setMobileNavActive(false)}>
-                Account
-              </NavLink>
+            <NavLinksContainer
+              ref={containerRef}
+              onMouseLeave={() => setHoveredHref(null)}
+              onBlur={(e) => {
+                if (containerRef.current && !containerRef.current.contains(e.relatedTarget)) {
+                  setHoveredHref(null);
+                }
+              }}
+            >
+              {NAV_ITEMS.map(item => (
+                <NavLink
+                  key={item.href}
+                  ref={el => {
+                    linkRefs.current[item.href] = el;
+                  }}
+                  href={item.href}
+                  $active={isActive(item.href)}
+                  onMouseEnter={() => setHoveredHref(item.href)}
+                  onFocus={() => setHoveredHref(item.href)}
+                  onClick={() => {
+                    setHoveredHref(null);
+                    setMobileNavActive(false);
+                  }}
+                >
+                  {item.label}
+                </NavLink>
+              ))}
+              <NavUnderline
+                $animate={isReady}
+                style={{
+                  left: `${indicator.left}px`,
+                  width: `${indicator.width}px`,
+                  opacity: indicator.opacity,
+                }}
+                aria-hidden="true"
+              />
             </NavLinksContainer>
 
             <DrawerFooter>
